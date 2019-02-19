@@ -1,37 +1,27 @@
-/*
-   March 2014 - TMRh20 - Updated along with High Speed RF24 Library fork
-   Parts derived from examples by J. Coliz <maniacbug@ymail.com>
-*/
-/**
- * Example for efficient call-response using ack-payloads
- *
- * This example continues to make use of all the normal functionality of the radios including
- * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well.
- * This allows very fast call-response communication, with the responding radio never having to
- * switch out of Primary Receiver mode to send back a payload, but having the option to switch to
- * primary transmitter if wanting to initiate communication instead of respond to a commmunication.
- */
-
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
 
-RF24 radio(9,10);
+#define CE_PIN  9
+#define CSN_PIN 10
+#define LED_PIN 7
+#define BUZZER_PIN 4
+#define TONE 500
 
+// Initialize
+RF24 radio(CE_PIN, CSN_PIN);
 byte counter = 1;
-
 const uint64_t pipe = 0xE8E8F0F0E1LL;
+
 void setup()
 {
-
+  // SERIAL SETTINGS
   Serial.begin(9600);
   printf_begin();
-  printf("\n\rRF24/examples/GettingStarted/\n\r");
-  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
+  printf("\n\r ***** REMOTE CONTROL ***** \n\r");
 
-  // Setup and configure radio
-
+  // RADIO SETTINGS
   radio.begin();
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
   radio.enableAckPayload();               // Allow optional ack payloads
@@ -42,23 +32,27 @@ void setup()
   radio.startListening();                 // Start listening
   radio.powerUp();
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+
+  // BUZZER SETTINGS
+  pinMode(BUZZER_PIN, OUTPUT);
 }
 
 void loop(void)
 {
-/****************** Pong Back Role ***************************/
+
 /********************* RECEIVER ******************************/
-
-
-    byte pipeNo, gotByte;                          // Declare variables for the pipe and the byte received
-    while( radio.available(&pipeNo))
-    {              // Read all available payloads
+    byte pipeNo, gotByte;                           // Declare variables for the pipe and the byte received
+    while( radio.available(&pipeNo))                // Read all available payloads
+    {
       radio.read( &gotByte, 1 );
-                                                   // Since this is a call-response. Respond directly with an ack payload.
-                                                   // Ack payloads are much more efficient than switching to transmit mode to respond to a call
+
       radio.writeAckPayload(pipeNo, &gotByte, 1 );  // This can be commented out to send empty payloads.
       printf("Sent response %d \n\r", gotByte);
- }
 
-
+      digitalWrite(LED_PIN, HIGH);
+      tone (BUZZER_PIN, TONE);
+      delay(1000);
+      noTone(BUZZER_PIN);
+      digitalWrite(LED_PIN, LOW);
+    }
 }

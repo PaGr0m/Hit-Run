@@ -10,10 +10,13 @@
 // Initialize
 RF24 radio(CE_PIN, CSN_PIN);
 byte counter = 1;
-const uint64_t pipe = 0xE8E8F0F0E1LL;
+// const uint64_t pipe = 0xE8E8F0F0E1LL;
 int buttonState = 0;
 // END
 
+// TEST
+const byte address[6] = "00001"; // for Arduino UNO
+const byte address[6] = "00002"; // for Arduino NANO
 
 void setup()
 {
@@ -24,14 +27,25 @@ void setup()
 
   // RADIO SETTINGS
   radio.begin();
-  radio.setAutoAck(1);                    // Ensure autoACK is enabled
-  radio.enableAckPayload();               // Allow optional ack payloads
-  radio.setRetries(0,15);                 // Smallest time between retries, max no. of retries
-  radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
-  radio.openWritingPipe(pipe);            // Both radios listen on the same pipes by default, and switch when writing
-  radio.startListening();                 // Start listening
-  radio.powerUp();
-  radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+  // radio.setAutoAck(1);                    // Ensure autoACK is enabled
+  // radio.enableAckPayload();               // Allow optional ack payloads
+  // radio.setRetries(0,15);                 // Smallest time between retries, max no. of retries
+  // radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
+  // radio.openWritingPipe(pipe);            // Both radios listen on the same pipes by default, and switch when writing
+  // radio.startListening();                 // Start listening
+  // radio.powerUp();
+  // radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+
+  // <--- BEGIN --->
+  radio.setPALevel(RF24_PA_MIN);
+  radio.setChannel(108);
+  radio.setDataRate(RF24_250KBPS);
+  radio.setRetries(1, 15);
+  radio.openWritingPipe(address);
+
+  radio.stopListening();
+  // <--- END --->
+
 
   // BUTTON SETTINGS
   pinMode(BUTTON_PIN, INPUT_PULLUP);

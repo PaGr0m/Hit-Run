@@ -17,12 +17,34 @@
 #define PIN_LCD_DB6 3
 #define PIN_LCD_DB7 2
 
+// TEST RTC: BEGIN
+#include <Wire.h>
+#include "RTClib.h"
+RTC_DS3231 rtc;
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+const byte ROUND_MINUTE = 3;
+const byte ROUND_SECOND = 0;
+const int ROUND_TIME = ROUND_MINUTE*60 + ROUND_SECOND;
+
+byte roundMinute = 0;
+byte roundSecond = 0;
+
+boolean flagStart = false;
+
+// #include <Wire.h> // must be included here so that Arduino library object file references work
+// #include <RtcDS3231.h>
+// RtcDS3231<TwoWire> Rtc(Wire);
+// TEST RTC: END
+
 // Initialize
 RF24 radio(CE_PIN, CSN_PIN);
 LiquidCrystal lcd(PIN_LCD_RS, PIN_LCD_E, PIN_LCD_DB4, PIN_LCD_DB5, PIN_LCD_DB6, PIN_LCD_DB7); // (RS, E, DB4, DB5, DB6, DB7)
 byte counter = 1;
 // const uint64_t pipe = 0xE8E8F0F0E1LL;
 
+
+// RtcDS3231<TwoWire> Rtc(Wire);
 // const byte addresses[2][6] = {
 //   "00001",
 //   "00002"
@@ -41,7 +63,7 @@ boolean flag = true;
 
 void setup()
 {
-  // <--- SERIAL SETTINGS: BEGIN --->
+  // <--- SERIAL SETTINGS: BEGIN ---> !!!
   Serial.begin(9600);
   printf_begin();
   printf("\n\r ***** REMOTE CONTROL ***** \n\r");
@@ -68,7 +90,7 @@ void setup()
   // radio.setDataRate( RF24_250KBPS );
   // <--- 2 END --->
 
-  // <--- 3 BEGIN --->
+  // <--- 3 BEGIN ---> !!!
   radio.begin();                                             // Инициируем работу nRF24L01+
   radio.setChannel(5);                                       // Указываем канал приёма данных (от 0 до 127), 5 - значит приём данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
   radio.setDataRate     (RF24_1MBPS);                        // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
@@ -81,19 +103,56 @@ void setup()
 
   // <--- RADIO SETTINGS: END --->
 
-  // <--- LED DISPLAY: BEGIN --->
+  // <--- LED DISPLAY: BEGIN ---> !!!
   lcd.begin(16, 2);
 
   lcd.setCursor(0, 0);
   lcd.print("RED  0:0  GREEN");
 
   lcd.setCursor(0, 1);
-  lcd.print("Round 1");
+  lcd.print("TIME");
+
+  lcd.setCursor(5, 1);
+  lcd.print("3:00");
+  // lcd.print("Round 1");
   // <--- LED DISPLAY: END --->
 
 
   // BUZZER SETTINGS
   pinMode(BUZZER_PIN, OUTPUT);
+
+
+  // 2
+  delay(3000); // wait for console opening
+
+  Serial.print("CURRENT PC DATE: ");
+  Serial.print(__DATE__);
+  Serial.println();
+  Serial.print("CURRENT PC TIME: ");
+  Serial.print(__TIME__);
+  Serial.println();
+
+  rtc.adjust(DateTime(-1, -1, -1, 0, 0, 0));
+  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
+
+// if (! rtc.begin()) {
+//   Serial.println("Couldn't find RTC");
+//   while (1);
+// }
+//
+// if (rtc.lostPower()) {
+//   Serial.println("RTC lost power, lets set the time!");
+//   // following line sets the RTC to the date & time this sketch was compiled
+//   // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+//     rtc.adjust(DateTime(-1, -1, -1, 0, 1, 0));
+//   // This line sets the RTC with an explicit date & time, for example to set
+//   // January 21, 2014 at 3am you would call:
+//   // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+// }
+
+
+
 }
 
 void loop(void)
@@ -152,37 +211,149 @@ void loop(void)
     //// <--- SECOND END --->
 
 
-    // <--- THIRD BEGIN --->
-    if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+    // <--- THIRD BEGIN ---> !!!
+    // if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+    // {
+    //     // Читаем данные в массив data и указываем сколько байт читать
+    //     if(pipe == 1)
+    //       radio.read(&sportsmenRed, sizeof(sportsmenRed));
+    //     if(pipe == 2)
+    //       radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
+    //
+    //     printf("PIPE: %d\n", pipe);
+    //     printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
+    //
+    //     if (sportsmenRed < 10)
+    //       column = 5;
+    //     else
+    //       column = 4;
+    //
+    //     lcd.setCursor(column, 0);
+    //     lcd.print(sportsmenRed);
+    //
+    //     lcd.setCursor(7, 0);
+    //     lcd.print(sportsmenGreen);
+    //
+    //     lcd.setCursor(10, 1);
+    //     lcd.print("PIPE");
+    //     lcd.setCursor(15, 1);
+    //     lcd.print(pipe);
+    // }
+    // <--- THIRD END --->
+
+
+    // <--- FIFTH BEGIN ---> !!!
+    // DateTime now = rtc.now();
+    //
+    // if ((ROUND_TIME - (rtc.now().minute()*60 + rtc.now().second())) == 0)
+    //   Serial.print("TIMER END");
+    //
+    // Serial.print(now.hour());
+    // Serial.print(':');
+    // Serial.print(now.minute());
+    // Serial.print(':');
+    // Serial.print(now.second());
+    // Serial.println();
+    //
+    // delay(2000);
+    // <--- FIFTH END --->
+
+
+    // PROGRAM: BEGIN
+    // 1
+    // if ( Serial.available() )
+    // {
+    //     char c = toupper(Serial.read());
+    //     if ( c == 'Q' )
+    //     {
+    //       Serial.println(F("*** Changing to START FIGHT ***"));
+    //       flagStart = true;
+    //    }
+    //    else
+    //        if ( c == 'S')
+    //        {
+    //          Serial.println(F("*** Changing to STOP"));
+    //          flagStart = false;
+    //        }
+    // }
+
+    // 2
+    if (flagStart)
     {
-        // Читаем данные в массив data и указываем сколько байт читать
-        if(pipe == 1)
-          radio.read(&sportsmenRed, sizeof(sportsmenRed));
-        if(pipe == 2)
-          radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
+      printf("1\n");
+      rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
 
-        printf("PIPE: %d\n", pipe);
-        printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
 
-        if (sportsmenRed < 10)
-          column = 5;
+      while (1)
+      {
+        printf("2\n");
+        if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+        {
+            printf("3\n");
+            // Читаем данные в массив data и указываем сколько байт читать
+            if(pipe == 1)
+            {
+              radio.read(&sportsmenRed, sizeof(sportsmenRed));
+              roundMinute = rtc.now().minute();
+              roundSecond = rtc.now().second();
+              break;
+            }
+            if(pipe == 2)
+            {
+              radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
+              roundMinute = rtc.now().minute();
+              roundSecond = rtc.now().second();
+              break;
+            }
+
+
+            // printf("PIPE: %d\n", pipe);
+            // lcd.setCursor(10, 1);
+            // lcd.print("PIPE");
+            // lcd.setCursor(15, 1);
+            // lcd.print(pipe);
+        }
         else
-          column = 4;
+        {
+          printf("4\n");
 
-        lcd.setCursor(column, 0);
-        lcd.print(sportsmenRed);
+          lcd.setCursor(5, 1);
+          lcd.print(ROUND_MINUTE - rtc.now().minute());
+          lcd.setCursor(7, 1);
+          lcd.print(60 - rtc.now().second());
 
-        lcd.setCursor(7, 0);
-        lcd.print(sportsmenGreen);
+        }
+      }
+    }
+    else if (!flagStart)
+    {
+      // printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
+      //
+      // if (sportsmenRed < 10)
+      //   column = 5;
+      // else
+      //   column = 4;
+      //
+      // lcd.setCursor(column, 0);
+      // lcd.print(sportsmenRed);
+      //
+      // lcd.setCursor(7, 0);
+      // lcd.print(sportsmenGreen);
+      if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+      {
+          // Читаем данные в массив data и указываем сколько байт читать
+          if(pipe == 1)
+            radio.read(&sportsmenRed, sizeof(sportsmenRed));
+          if(pipe == 2)
+            radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
 
-        lcd.setCursor(10, 1);
-        lcd.print("PIPE");
-        lcd.setCursor(15, 1);
-        lcd.print(pipe);
+          printf("PIPE: %d\n", pipe);
+          printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
+        }
     }
 
 
-    // <--- THIRD END --->
+    // PROGRAM END
 }
 
 void beepAndLed ()

@@ -28,36 +28,37 @@ void setup()
   printf("\n\r Address: 0xAABBCCDD22LL, sportsmen - GREEN \n\r");
   printf("\n\r <----- EPEE SENDER -----> \n\r");
 
-  // RADIO SETTINGS
+
+  // <--- RADIO SETTINGS --->
   radio.begin();
+
+  radio.setChannel(5);                                       // Указываем канал передачи данных (от 0 до 127), 5 - значит передача данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
+  radio.setDataRate     (RF24_1MBPS);                        // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
+  radio.setPALevel      (RF24_PA_HIGH);                      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+  radio.openWritingPipe (0xAABBCCDD11LL);                    // NANO
+  // radio.openWritingPipe (0xAABBCCDD22LL);                    // UNO
+
+  // radio.stopListening();
+
+
+  // // <--- 2 BEGIN --->
   // radio.setAutoAck(1);                    // Ensure autoACK is enabled
   // radio.enableAckPayload();               // Allow optional ack payloads
   // radio.setRetries(0,15);                 // Smallest time between retries, max no. of retries
   // radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
-  // radio.openWritingPipe(pipe);            // Both radios listen on the same pipes by default, and switch when writing
+
+  // radio.setPALevel(RF24_PA_MIN);
+  // radio.setChannel(108);
+  // radio.setRetries(1, 15);
+
   // radio.startListening();                 // Start listening
   // radio.powerUp();
   // radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 
-  // // <--- 2 BEGIN --->
-  // radio.setPALevel(RF24_PA_MIN);
-  // radio.setChannel(108);
-  // radio.setDataRate(RF24_250KBPS);
-  // radio.setRetries(1, 15);
-  // radio.openWritingPipe(address);
-  //
   // radio.stopListening();
   // // <--- 2 END --->
 
-  // <--- 3 BEGIN --->
-  radio.setChannel(5);                                       // Указываем канал передачи данных (от 0 до 127), 5 - значит передача данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
-  radio.setDataRate     (RF24_1MBPS);                        // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
-  radio.setPALevel      (RF24_PA_HIGH);                      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
-  // radio.openWritingPipe (0xAABBCCDD11LL);                    // NANO
-  radio.openWritingPipe (0xAABBCCDD22LL);                    // UNO
 
-  // radio.stopListening();
-  // <--- 3 END --->
 
   // BUTTON SETTINGS
   pinMode(PIN_BUTTON, INPUT_PULLUP);

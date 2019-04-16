@@ -37,7 +37,7 @@
 -IC:\Users\PaGrom\.platformio\packages\tool-unity
 -IC:\Users\PaGrom\Desktop\Hit&amp;Run\FencingDisplay\include
 -IC:\Users\PaGrom\Desktop\Hit&amp;Run\FencingDisplay\src
--DPLATFORMIO=30604
+-DPLATFORMIO=30606
 -DARDUINO_AVR_UNO
 -DF_CPU=16000000L
 -DARDUINO_ARCH_AVR

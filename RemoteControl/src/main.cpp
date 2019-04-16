@@ -44,13 +44,6 @@ byte counter = 1;
 // const uint64_t pipe = 0xE8E8F0F0E1LL;
 
 
-// RtcDS3231<TwoWire> Rtc(Wire);
-// const byte addresses[2][6] = {
-//   "00001",
-//   "00002"
-// };
-// const byte Addr1[6] = "00001";
-// const byte Addr2[6] = "00002";
 
 int            data[1];  // Создаём массив для приёма данных (так как мы будем принимать от каждого передатчика только одно двухбайтное число, то достаточно одного элемента массива типа int)
 uint8_t        pipe;
@@ -94,9 +87,9 @@ void setup()
   radio.begin();                                             // Инициируем работу nRF24L01+
   radio.setChannel(5);                                       // Указываем канал приёма данных (от 0 до 127), 5 - значит приём данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
   radio.setDataRate     (RF24_1MBPS);                        // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
-  radio.setPALevel      (RF24_PA_HIGH);                      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
-  radio.openReadingPipe (1, 0xAABBCCDD11LL);                 // Открываем 1 трубу с идентификатором 1 передатчика 0xAABBCCDD11, для приема данных
-  radio.openReadingPipe (2, 0xAABBCCDD22LL);                 // Открываем 2 трубу с идентификатором 2 передатчика 0xAABBCCDD22, для приема данных
+  radio.setPALevel      (RF24_PA_HIGH);                      // Указываем мощность передатчика RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+  // radio.openReadingPipe (1, 0xAABBCCDD11LL);                 // Открываем 1 трубу с идентификатором 1 передатчика 0xAABBCCDD11, для приема данных
+  // radio.openReadingPipe (2, 0xAABBCCDD22LL);                 // Открываем 2 трубу с идентификатором 2 передатчика 0xAABBCCDD22, для приема данных
   radio.startListening  ();
   // <--- 3 END --->
 
@@ -109,11 +102,11 @@ void setup()
   lcd.setCursor(0, 0);
   lcd.print("RED  0:0  GREEN");
 
-  lcd.setCursor(0, 1);
-  lcd.print("TIME");
-
-  lcd.setCursor(5, 1);
-  lcd.print("3:00");
+  // lcd.setCursor(0, 1);
+  // lcd.print("TIME");
+  //
+  // lcd.setCursor(5, 1);
+  // lcd.print("3:00");
   // lcd.print("Round 1");
   // <--- LED DISPLAY: END --->
 
@@ -125,15 +118,14 @@ void setup()
   // 2
   delay(3000); // wait for console opening
 
-  Serial.print("CURRENT PC DATE: ");
-  Serial.print(__DATE__);
-  Serial.println();
-  Serial.print("CURRENT PC TIME: ");
-  Serial.print(__TIME__);
-  Serial.println();
+  // Serial.print("CURRENT PC DATE: ");
+  // Serial.print(__DATE__);
+  // Serial.println();
+  // Serial.print("CURRENT PC TIME: ");
+  // Serial.print(__TIME__);
+  // Serial.println();
 
-  rtc.adjust(DateTime(-1, -1, -1, 0, 0, 0));
-  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  // rtc.adjust(DateTime(-1, -1, -1, 0, 0, 0));
 
 
 // if (! rtc.begin()) {
@@ -277,17 +269,19 @@ void loop(void)
     //        }
     // }
 
-    // 2
-    if (flagStart)
-    {
-      printf("1\n");
-      rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
-
-
+    // 2 WORKED
+    // if (flagStart)
+    // {
+    //   printf("1\n");
+    //   rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
+    //
+    //
       while (1)
       {
+        // uint8_t pipe = 0;
         printf("2\n");
         if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+        // if(radio.available(1))
         {
             printf("3\n");
             // Читаем данные в массив data и указываем сколько байт читать
@@ -307,7 +301,7 @@ void loop(void)
             }
 
 
-            // printf("PIPE: %d\n", pipe);
+            printf("PIPE: %d\n", pipe);
             // lcd.setCursor(10, 1);
             // lcd.print("PIPE");
             // lcd.setCursor(15, 1);
@@ -324,43 +318,44 @@ void loop(void)
 
         }
       }
-    }
-    else if (!flagStart)
-    {
-      // printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
-      //
-      // if (sportsmenRed < 10)
-      //   column = 5;
-      // else
-      //   column = 4;
-      //
-      // lcd.setCursor(column, 0);
-      // lcd.print(sportsmenRed);
-      //
-      // lcd.setCursor(7, 0);
-      // lcd.print(sportsmenGreen);
-      if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
-      {
-          // Читаем данные в массив data и указываем сколько байт читать
-          if(pipe == 1)
-            radio.read(&sportsmenRed, sizeof(sportsmenRed));
-          if(pipe == 2)
-            radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
-
-          printf("PIPE: %d\n", pipe);
-          printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
-        }
-    }
+    // }
+    // else if (!flagStart)
+    // {
+    //   // printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
+    //   //
+    //   // if (sportsmenRed < 10)
+    //   //   column = 5;
+    //   // else
+    //   //   column = 4;
+    //   //
+    //   // lcd.setCursor(column, 0);
+    //   // lcd.print(sportsmenRed);
+    //   //
+    //   // lcd.setCursor(7, 0);
+    //   // lcd.print(sportsmenGreen);
+    //   if(radio.available(&pipe))  // Если в буфере имеются принятые данные, то получаем номер трубы, по которой они пришли, по ссылке на переменную pipe
+    //   {
+    //       // Читаем данные в массив data и указываем сколько байт читать
+    //       if(pipe == 1)
+    //         radio.read(&sportsmenRed, sizeof(sportsmenRed));
+    //       if(pipe == 2)
+    //         radio.read(&sportsmenGreen, sizeof(sportsmenGreen));
+    //
+    //       printf("PIPE: %d\n", pipe);
+    //       printf("RED %d : %d GREEN\n", sportsmenRed, sportsmenGreen);
+    //     }
+    // }
+    // END WORKED
 
 
     // PROGRAM END
 }
 
-void beepAndLed ()
-{
-  digitalWrite(LED_PIN, HIGH);
-  tone (BUZZER_PIN, TONE);
-  delay(1000);
-  noTone(BUZZER_PIN);
-  digitalWrite(LED_PIN, LOW);
-}
+// void beepAndLed ()
+// {
+//   digitalWrite(LED_PIN, HIGH);
+//   tone (BUZZER_PIN, TONE);
+//   delay(1000);
+//   noTone(BUZZER_PIN);
+//   digitalWrite(LED_PIN, LOW);
+// }

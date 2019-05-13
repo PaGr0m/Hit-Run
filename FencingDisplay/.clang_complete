@@ -1,13 +1,13 @@
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\cores\arduino
--IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\variants\standard
--IC:\Users\PaGrom\.platformio\lib\LiquidCrystal_ID887\src
+-IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\variants\eightanaloginputs
 -IC:\Users\PaGrom\.platformio\lib\RF24_ID433
 -IC:\Users\PaGrom\.platformio\lib\RF24_ID433\utility
+-IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\SPI\src
+-IC:\Users\PaGrom\.platformio\lib\LiquidCrystal_ID887\src
 -IC:\Users\PaGrom\.platformio\lib\RTC_ID274\src
 -IC:\Users\PaGrom\.platformio\lib\RTClib_ID83
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\EEPROM\src
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\HID\src
--IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\SPI\src
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\SoftwareSerial\src
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\__cores__\arduino\Wire\src
 -IC:\Users\PaGrom\.platformio\packages\framework-arduinoavr\libraries\Adafruit_CircuitPlayground
@@ -38,7 +38,7 @@
 -IC:\Users\PaGrom\Desktop\Hit&amp;Run\FencingDisplay\include
 -IC:\Users\PaGrom\Desktop\Hit&amp;Run\FencingDisplay\src
 -DPLATFORMIO=30606
--DARDUINO_AVR_UNO
+-DARDUINO_AVR_NANO
 -DF_CPU=16000000L
 -DARDUINO_ARCH_AVR
 -DARDUINO=10805

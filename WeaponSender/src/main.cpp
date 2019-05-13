@@ -3,26 +3,29 @@
 #include "RF24.h"
 #include "printf.h"
 
-#define CE_PIN  9
-#define CSN_PIN 10
-#define PIN_BUTTON 7
-#define PIN_LED 4
+
+#define PIN_BUTTON 4
+#define PIN_LED 2
+
+// WITH ADAPTER
+// #define CE_PIN  9
+// #define CSN_PIN 10
+// END WITH
+
+// WITHOUT ADAPTER
+#define CE_PIN  7
+#define CSN_PIN 8
+
 
 // Initialize
 RF24 radio(CE_PIN, CSN_PIN);
-byte counter = 1;
-// const uint64_t pipe = 0xE8E8F0F0E1LL;
-int buttonState = 0;
+byte counter = 0;
+byte buttonState = 0;
 // END
-
-// TEST
-byte tmp = 0;
-// const byte address[6] = "00001"; // for Arduino UNO
-const byte address[6] = "00002"; // for Arduino NANO
 
 void setup()
 {
-  // SERIAL SETTINGS
+  // <--- SERIAL SETTINGS --->
   Serial.begin(9600);
   printf_begin();
   printf("\n\r Address: 0xAABBCCDD22LL, sportsmen - GREEN \n\r");
@@ -40,26 +43,6 @@ void setup()
 
   // radio.stopListening();
 
-
-  // // <--- 2 BEGIN --->
-  // radio.setAutoAck(1);                    // Ensure autoACK is enabled
-  // radio.enableAckPayload();               // Allow optional ack payloads
-  // radio.setRetries(0,15);                 // Smallest time between retries, max no. of retries
-  // radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
-
-  // radio.setPALevel(RF24_PA_MIN);
-  // radio.setChannel(108);
-  // radio.setRetries(1, 15);
-
-  // radio.startListening();                 // Start listening
-  // radio.powerUp();
-  // radio.printDetails();                   // Dump the configuration of the rf unit for debugging
-
-  // radio.stopListening();
-  // // <--- 2 END --->
-
-
-
   // BUTTON SETTINGS
   pinMode(PIN_BUTTON, INPUT_PULLUP);
 
@@ -71,43 +54,16 @@ void setup()
 void loop(void)
 {
 
-/********************** SENDER *******************************/
-buttonState = digitalRead(PIN_BUTTON);
-if (buttonState == HIGH)
-{
-  Serial.print("Button\n");
-  tmp++;
-  radio.write(&tmp, sizeof(tmp));
-  printf("%d\n", tmp);
-  digitalWrite(PIN_LED, HIGH);
-  delay(2000);
-}
-digitalWrite(PIN_LED, LOW);
-
-// if (buttonState == HIGH)
-// {
-//
-//     byte gotByte;                                           // Initialize a variable for the incoming response
-//
-//     radio.stopListening();                                  // First, stop listening so we can talk.
-//     printf("Now sending %d as payload. ",counter);          // Use a simple byte counter as payload
-//     unsigned long time = micros();                          // Record the current microsecond count
-//
-//     if (radio.write(&counter, 1))
-//     {                                                       // Send the counter variable to the other radio
-//         if(!radio.available())                              // If nothing in the buffer, we got an ack but it is blank
-//             printf("Got blank response. round-trip delay: %lu microseconds\n\r", micros()-time );
-//         else
-//             while(radio.available() ){                      // If an ack with payload was received
-//                 radio.read( &gotByte, 1 );                  // Read it, and display the response time
-//                 printf("Got response %d, round-trip delay: %lu microseconds\n\r", gotByte, micros()-time);
-//                 counter++;                                  // Increment the counter variable
-//             }
-//     }
-//     else                                                    // If no ack response, sending failed
-//       printf("Sending failed.\n\r");
-//
-//       // Try again later
-//       delay(1000);
-//   }
+  /********************** SENDER *******************************/
+  buttonState = digitalRead(PIN_BUTTON);
+  if (buttonState == LOW)
+  {
+    Serial.print("Button\n");
+    counter++;
+    radio.write(&counter, sizeof(counter));
+    printf("%d\n", counter);
+    digitalWrite(PIN_LED, HIGH);
+    delay(2000);
+    digitalWrite(PIN_LED, LOW);
+  }
 }

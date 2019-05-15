@@ -3,6 +3,7 @@
 #include <SPI.h>
 
 #include <LiquidCrystal.h>
+#include "printf.h"
 
 #define PIN_LCD_RS  7
 #define PIN_LCD_E   6
@@ -20,18 +21,22 @@ int data;
 
 void setup()
 {
-        Serial.begin(9600);
+    Serial.begin(9600);
+    printf_begin();
+    printf("\n\r ***** CONTROLLER ****** \n\r");
+
+    // Wait for console opening
+    delay(3000);
 }
 
 void loop()
 {
-        if (Serial.available())
-        {
-                data = Serial.read();
+    if (Serial.available())
+    {
+        data = Serial.read();
 
-                lcd.setCursor(0, 1);
-                // lcd.write(data);
-                lcd.print(data);
-
-        }
+        lcd.setCursor(0, 1);
+        // lcd.write(data);
+        lcd.print(char(data));
+    }
 }

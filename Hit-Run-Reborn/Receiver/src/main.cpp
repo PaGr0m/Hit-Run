@@ -6,16 +6,20 @@
 #include "RF24.h"
 #include "printf.h"
 
-#define PIN_NRF_CSN 10
-#define PIN_NRF_CE 9
+#define PIN_NRF_CE 7  // 9  with adapter
+#define PIN_NRF_CSN 8 // 10 with adapter
+
 
 // Initialize
-RF24 radio(CE_PIN, CSN_PIN);
+RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
+uint8_t pipe;
 
 // Setup
 void setup() {
   Serial.begin(9600);
   printf_begin();
+  printf("\n\r >>>>> RECEIVER <<<<< \n\r");
+
 
   // Radio settings
   radio.begin();                              // Инициируем работу nRF24L01+
@@ -24,7 +28,7 @@ void setup() {
   radio.setPALevel(RF24_PA_HIGH);             // Указываем мощность передатчика RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
   radio.openReadingPipe(1, 0xAABBCCDD11LL);   // Открываем 1 трубу с идентификатором 1 передатчика 0xAABBCCDD11, для приема данных
   radio.openReadingPipe(2, 0xAABBCCDD22LL);   // Открываем 2 трубу с идентификатором 2 передатчика 0xAABBCCDD22, для приема данных
-  radio.printDetails();
+  // radio.printDetails();
   radio.startListening();
 
   // Wait for console opening
@@ -38,9 +42,16 @@ void loop() {
   Если в буфере имеются принятые данные, то получаем номер трубы,
   по которой они пришли, по ссылке на переменную pipe
   */
+  uint8_t reveiveData;
+
   if(radio.available(&pipe))
   {
-    Serial.printf("%s\n", pipe);
+    radio.read(&reveiveData, sizeof(reveiveData) );
+    printf("%d", reveiveData);
+    delay(2000);
+
+    // Serial.write(pipe);
+    // printf("%s\n", pipe);
 
     // TODO: добавить возможность обоюдного удара
     // дать время на считывание второго спортсмена

@@ -6,13 +6,11 @@
 #include "RF24.h"
 #include "printf.h"
 
-#define PIN_NRF_CE  7
-#define PIN_NRF_CSN 8
+#define PIN_NRF_CE  7   // 7 without adapter , 9
+#define PIN_NRF_CSN 8  // 8 without adapter , 10
 
-#define PIN_LED 2
-#define PIN_BUTTON 4
-
-
+#define PIN_LED 4
+#define PIN_BUTTON 2
 
 
 // Initialize
@@ -23,23 +21,27 @@ byte buttonState = 0;
 byte blankMessage = 9;
 // byte blankMessage = NULL;
 
-void send() {
-        buttonState = digitalRead(PIN_BUTTON);
 
-        if (buttonState == LOW)
-        {
-                radio.write(blankMessage, sizeof(blankMessage));
-                // digitalWrite(PIN_LED, HIGH);
-                delay(2000);
-                // digitalWrite(PIN_LED, LOW);
-        }
+void send() {
+    // buttonState = digitalRead(PIN_BUTTON);
+    //
+    // if (buttonState == HIGH)
+    // {
+    //     radio.write(&blankMessage, sizeof(blankMessage));
+    //     digitalWrite(PIN_LED, HIGH);
+    //     delay(2000);
+    //     digitalWrite(PIN_LED, LOW);
+    // }
 }
+
+
 // Setup
 void setup() {
 
         // Serial settings
         Serial.begin(9600);
         printf_begin();
+        printf("\n\r <<--- SENDER --->> \n\r");
 
         // Radio settings
         radio.begin();
@@ -49,26 +51,26 @@ void setup() {
         radio.openWritingPipe(0xAABBCCDD11LL);    // NANO
         // radio.openWritingPipe (0xAABBCCDD22LL);   // UNO
 
+        // Wait for console opening
+        delay(3000);
+
 }
+
 
 // Loop
 void loop() {
 
-        /*
-           Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
-         */
-        // buttonState = digitalRead(PIN_BUTTON);
-        //
-        // if (buttonState == LOW)
-        // {
-        //         Serial.print("Button\n");
-        //         counter++;
-        //         radio.write(&counter, sizeof(counter));
-        //         printf("%d\n", counter);
-        //         digitalWrite(PIN_LED, HIGH);
-        //         delay(2000);
-        //         digitalWrite(PIN_LED, LOW);
-        // }
+    /*
+    Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
+    */
+    buttonState = digitalRead(PIN_BUTTON);
 
-        send();
+    if (buttonState == HIGH)
+    {
+        radio.write(&blankMessage, sizeof(blankMessage));
+        printf("Button clicked!\n");
+        digitalWrite(PIN_LED, HIGH);
+        delay(2000);
+        digitalWrite(PIN_LED, LOW);
+    }
 }

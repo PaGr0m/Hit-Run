@@ -4,13 +4,16 @@
 
 #include <LiquidCrystal.h>
 #include <IRremote.h>
+#include "RTClib.h"
 #include "printf.h"
 
-#define REMOTE_CONTROL_CODE_START 0xFFA857
-#define REMOTE_CONTROL_CODE_STOP 0xFFA858
+#define REMOTE_CONTROL_CODE_START         0xFFC23D  // Play
+#define REMOTE_CONTROL_CODE_STOP          0xFF906F  // EQ
 
-#define REMOTE_CONTROL_CODE_REFRESH_TIMER 0xFFA857
+#define REMOTE_CONTROL_CODE_REFRESH_TIMER 0xFF42BD  // 7
+#define REMOTE_CONTROL_CODE_REFRESH_SCORE 0xFF4AB5  // 8
 
+#define ROUND_MINUTE 3
 
 #define PIN_IR_REMOTE_CONTROL 12
 #define PIN_LCD_RS  7
@@ -28,23 +31,25 @@ RTC_DS3231 rtc;
 
 decode_results results;
 
-byte data;
-byte sportsmenFirst  = 0;
-byte sportsmenSecond = 0;
+uint8_t data;
+uint8_t sportsmenFirst  = 0;
+uint8_t sportsmenSecond = 0;
 
+uint8_t roundMinute = 0;
+uint8_t roundSecond = 0;
 
 
 // TODO: заменить столбцы на переменные
 /*
 Метод обновляет счет бойцов на экране LCD
 */
-void updateLcdScore(byte first, byte second)
+void updateLcdScore(uint8_t firstScore, uint8_t secondScore)
 {
-    lcd.setCursor(first < 10 ? 5 : 4, 0);
-    lcd.print(first);
+    lcd.setCursor(firstScore < 10 ? 5 : 4, 0);
+    lcd.print(firstScore);
 
     lcd.setCursor(7, 0);
-    lcd.print(sportsmenRed);
+    lcd.print(secondScore);
 }
 
 /*
@@ -52,11 +57,11 @@ void updateLcdScore(byte first, byte second)
 */
 void updateLcdTimer(uint8_t minute, uint8_t second)
 {
-    lcd.setCursor(first < 10 ? 5 : 4, 0);
-    lcd.print(first);
+    lcd.setCursor(10, 1);
+    lcd.print(minute);
 
-    lcd.setCursor(7, 0);
-    lcd.print(sportsmenRed);
+    lcd.setCursor(12, 1);
+    lcd.print(second);
 }
 
 /*
@@ -68,8 +73,12 @@ void setup()
     printf_begin();
     printf("\n\r ***** CONTROLLER ****** \n\r");
 
+    irRecv.enableIRIn(); // Start the receiver
     // Wait for console opening
     delay(3000);
+
+    lcd.setCursor(15, 1);
+    lcd.print("!");
 }
 
 /*
@@ -82,8 +91,39 @@ void loop()
     */
     if (irRecv.decode(&results))
     {
+        Serial.println(results.value, HEX);
         switch (results.value)
         {
+          // Button 7 | Обновить время на таймере до 3:00
+          case REMOTE_CONTROL_CODE_REFRESH_TIMER:
+          {
+              printf("CASE: %ld\n", REMOTE_CONTROL_CODE_REFRESH_TIMER);
+              roundMinute = ROUND_MINUTE;
+              roundSecond = 0;
+              updateLcdTimer(3, 0);
+              // rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
+
+              // TODO: вывод на LCD таймер (вручную)
+              // irRecv.resume();
+              break;
+          }
+
+          // Button 8 | Обнулить счет бойцов
+          case REMOTE_CONTROL_CODE_REFRESH_SCORE:
+          {
+            printf("CASE: %ld\n", REMOTE_CONTROL_CODE_REFRESH_SCORE);
+
+              // TODO: Поменять значения на 0
+              sportsmenFirst  = 9;
+              sportsmenSecond = 8;
+
+              updateLcdScore(sportsmenFirst, sportsmenSecond);
+
+              // irRecv.resume();
+              break;
+              // TODO: вывод на LCD счёта (вручную)
+          }
+
             // Начать бой
             case REMOTE_CONTROL_CODE_START:
             {
@@ -98,7 +138,7 @@ void loop()
 
                 rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
                 // while (!REMOTE_CONTROL_CODE_STOP)
-                while ( )
+                while (results.value != REMOTE_CONTROL_CODE_STOP || Serial.available())
                 {
                     // Проверка:
                     // были ли присланы данные от спортсменов об уколах
@@ -137,35 +177,17 @@ void loop()
                         lcd.print(60 - rtc.now().second());
                     }
                 }
-                updateLcdScore(&sportsmenFirst, &sportsmenSecond);
+                updateLcdScore(sportsmenFirst, sportsmenSecond);
 
                 break;
-            }
-
-            // Обновить время на таймере до 3:00
-            case REMOTE_CONTROL_CODE_REFRESH_TIMER:
-            {
-                roundMinute = ROUND_MINUTE;
-                roundSecond = 0;
-                // rtc.adjust(DateTime(-1, -1, -1, 0, roundMinute, roundSecond));
-
-                // TODO: вывод на LCD таймер (вручную)
-            }
-
-            case REMOTE_CONTROL_CODE_REFRESH_SCORE:
-            {
-                sportsmenFirst  = 0;
-                sportsmenSecond = 0;
-
-                updateLcdScore(&sportsmenFirst, &sportsmenSecond);
-
-                // TODO: вывод на LCD счёта (вручную)
             }
         }
 
         irRecv.resume();
     }
 
+    // TODO: УБРАТЬ!
+    delay(100);
 
     // if (Serial.available())
     // {

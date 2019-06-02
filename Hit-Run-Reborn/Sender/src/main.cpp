@@ -17,10 +17,7 @@
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
 
 byte buttonState = 0;
-
 byte blankMessage = 9;
-// byte blankMessage = NULL;
-
 
 void send() {
     // buttonState = digitalRead(PIN_BUTTON);

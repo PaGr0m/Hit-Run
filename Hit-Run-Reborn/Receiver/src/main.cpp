@@ -6,6 +6,9 @@
 #include "RF24.h"
 #include "printf.h"
 
+
+#define PIN_LED 4
+
 #define PIN_NRF_CE 7  // 9  with adapter
 #define PIN_NRF_CSN 8 // 10 with adapter
 
@@ -31,6 +34,9 @@ void setup() {
   // radio.printDetails();
   radio.startListening();
 
+  // LED settings
+  pinMode(PIN_LED, OUTPUT);
+
   // Wait for console opening
   delay(3000);
 }
@@ -46,9 +52,13 @@ void loop() {
 
   if(radio.available(&pipe))
   {
-    radio.read(&reveiveData, sizeof(reveiveData) );
-    printf("%d", reveiveData);
+    radio.read(&reveiveData, sizeof(reveiveData));
+    // printf("%d", reveiveData);
+    printf("%d", pipe);
+
+    digitalWrite(PIN_LED, HIGH);
     delay(2000);
+    digitalWrite(PIN_LED, LOW);
 
     // Serial.write(pipe);
     // printf("%s\n", pipe);

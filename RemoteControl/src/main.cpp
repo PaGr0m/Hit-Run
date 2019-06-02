@@ -1,4 +1,5 @@
-#include <SPI.h>
+// roundMinute = rtc.now().minute();
+              // roundSecond = rtc.now().second();#include <SPI.h>
 #include <LiquidCrystal.h>
 #include "nRF24L01.h"
 #include "RF24.h"

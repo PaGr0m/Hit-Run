@@ -12,24 +12,18 @@
 #define PIN_LED 4
 #define PIN_BUTTON 2
 
+/** Sportsmen Colors
+ *  1 - GREEN
+ *  2 - RED
+ */
+const byte SPORTSMEN_COLOR = 1;
+
 
 // Initialize
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
 
 byte buttonState = 0;
 byte blankMessage = 9;
-
-void send() {
-    // buttonState = digitalRead(PIN_BUTTON);
-    //
-    // if (buttonState == HIGH)
-    // {
-    //     radio.write(&blankMessage, sizeof(blankMessage));
-    //     digitalWrite(PIN_LED, HIGH);
-    //     delay(2000);
-    //     digitalWrite(PIN_LED, LOW);
-    // }
-}
 
 
 // Setup
@@ -64,7 +58,7 @@ void loop() {
 
     if (buttonState == HIGH)
     {
-        radio.write(&blankMessage, sizeof(blankMessage));
+        radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
         printf("Button clicked!\n");
         digitalWrite(PIN_LED, HIGH);
         delay(2000);

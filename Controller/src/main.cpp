@@ -56,13 +56,30 @@
 
 /** Initialize Variables 
  */
-const uint64_t pipe01 = 0xF0F1F2F3F4LL;
-const uint8_t TIME_DUAL_HIT = 100;
 uint8_t sportsmenGreen;
 uint8_t sportsmenRed;
-volatile boolean flag_tx = false;
-volatile boolean flag_fail = false;
-volatile boolean flag_rx = false;
+volatile bool flag_tx = false;
+volatile bool flag_fail = false;
+volatile bool flag_rx = false;
+
+const uint8_t STATUS_SPORTSMEN_GREEN            = 1;
+const uint8_t STATUS_SPORTSMEN_RED              = 2;
+
+const uint8_t STATUS_BUTTON_START               = 0;
+const uint8_t STATUS_BUTTON_SCORE_GREEN_UP      = 3;
+const uint8_t STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
+const uint8_t STATUS_BUTTON_SCORE_RED_UP        = 5;
+const uint8_t STATUS_BUTTON_SCORE_RED_DOWN      = 6;
+const uint8_t STATUS_BUTTON_UPDATE_SCORE        = 7;
+const uint8_t STATUS_BUTTON_UPDATE_TIMER        = 8;
+const uint8_t STATUS_BUTTON_STOP                = 9;
+
+const uint8_t STATUS_HIT_GREEN          = 1;
+const uint8_t STATUS_HIT_RED            = 2;
+const uint8_t STATUS_HIT_DUAL           = 3;
+const uint8_t STATUS_HIT_GREEN_REMOVE   = 8;
+const uint8_t STATUS_HIT_RED_REMOVE     = 9;
+const uint8_t STATUS_HIT_UPDATE         = 0;
 
 
 /** Initialize Objects 
@@ -166,18 +183,31 @@ void updateScoreLcd(uint8_t sportsmenGreen, uint8_t sportsmenRed)
  */
 void updateScoreCounter(uint8_t status) 
 {
-    if (status == 1)
+    if (status == STATUS_HIT_GREEN)
     {
         sportsmenGreen++;
     }
-    else if (status == 2)
+    else if (status == STATUS_HIT_RED)
     {
         sportsmenRed++;
     }
-    else if (status == 3)
+    else if (status == STATUS_HIT_DUAL)
     {
         sportsmenGreen++;
         sportsmenRed++;
+    }
+    else if (status == STATUS_HIT_RED)
+    {
+        sportsmenRed++;
+    }
+    else if (status == STATUS_HIT_RED)
+    {
+        sportsmenRed++;
+    }
+    else if (status == STATUS_HIT_UPDATE)
+    {
+        sportsmenRed = 0;
+        sportsmenGreen = 0;
     }
 
     updateScoreLcd(sportsmenGreen, sportsmenRed);
@@ -204,6 +234,9 @@ void setup()
     displayInitial();
 }
 
+
+// TODO: что будет, если read ничего не вернет ?
+// TODO: проверить на работоспособность. Иначе переделать прерывание
 /** Бесконечный цикл микроконтроллера 
  */
 void loop() 
@@ -213,25 +246,81 @@ void loop()
     if (flag_rx) 
     {
         printf("Flag_RX: true \n"); // TODO: убрать
-        flag_rx = false;
 
-        uint8_t sportsmenStatus = 0;
-        radio.read(&sportsmenStatus, sizeof(sportsmenStatus));
+        uint8_t receiveStatus = 1000;
+        radio.read(&receiveStatus, sizeof(receiveStatus));
 
-        // FIXME: попытка проверки обоюдных ударов
-        uint8_t beginTime = millis();
-        while (millis() < beginTime + 40)
+        // не уверен, что будет работать
+        // возможно стоит изменить прерывание и уже там принимать переменную, а тут просто проверять ее в условия, и обновлять на несуществующий статус
+        if (receiveStatus == STATUS_BUTTON_START)
         {
-            if (flag_rx)
+            while (receiveStatus != STATUS_BUTTON_STOP)
             {
                 flag_rx = false;
-                sportsmenStatus = 3;   
+
+                uint8_t receiveStatus = 0;
+                radio.read(&receiveStatus, sizeof(receiveStatus));
+
+                // FIXME: попытка проверки обоюдных ударов
+                uint8_t beginTime = millis();
+                while (millis() < beginTime + 40)
+                {
+                    if (flag_rx)
+                    {
+                        flag_rx = false;
+                        receiveStatus = 3;   
+                    } 
+                }
+                // ---------------------------------------
+
+                printf("Sportsmen hit status: %d \n", receiveStatus);
+                updateScoreCounter(receiveStatus);
             } 
         }
-        // ---------------------------------------
+        else if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
+        {
+            flag_rx = false;
 
-        printf("Sportsmen hit status: %d \n", sportsmenStatus);
-        updateScoreCounter(sportsmenStatus);
+            // FIXME: попытка проверки обоюдных ударов
+            uint8_t beginTime = millis();
+            while (millis() < beginTime + 40)
+            {
+                if (flag_rx)
+                {
+                    flag_rx = false;
+                    receiveStatus = 3;   
+                } 
+            }
+            // ---------------------------------------
+
+            printf("Sportsmen hit status: %d \n", receiveStatus);
+            updateScoreCounter(receiveStatus);
+        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP)
+        {
+            updateScoreCounter(STATUS_HIT_GREEN);
+        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN)
+        {
+            updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
+        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_UP)
+        {
+            updateScoreCounter(STATUS_HIT_RED);
+        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_DOWN)
+        {
+            updateScoreCounter(STATUS_HIT_RED_REMOVE);
+        }
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_SCORE)
+        {
+            updateScoreCounter(STATUS_HIT_UPDATE);
+        }
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_TIMER)
+        {
+            // TODO: обновить время
+            // функция для времени
+        }
     }
 
     /** Если данные не отправленны 

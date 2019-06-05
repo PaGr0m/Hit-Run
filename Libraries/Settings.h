@@ -1,14 +1,14 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
+
 /** Define Variables 
- *  Константы переменных для функций
+ *  Константы переменных
  * 
  *  param: SERIAL
  *  param: RADIO
  *  param: STATUSES
  */
-
 #define SERIAL_BAUDRATE 9600
 
 #define RADIO_CHANNEL                   5
@@ -20,15 +20,22 @@
 #define RADIO_DATARATE                  RF24_1MBPS
 #define RADIO_PALEVEL                   RF24_PA_HIGH
 
+
+/** Define Variables 
+ *  Константы переменных
+ * 
+ *  param: STATUSES
+ */
 const unsigned char STATUS_BUTTON_START               = 0;
 const unsigned char STATUS_SPORTSMEN_GREEN            = 1;
 const unsigned char STATUS_SPORTSMEN_RED              = 2;
 const unsigned char STATUS_BUTTON_SCORE_GREEN_UP      = 3;
 const unsigned char STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
 const unsigned char STATUS_BUTTON_SCORE_RED_UP        = 5;
-const unsigned char STATUS_BUTTON_SCORE_RED_DPWN      = 6;
+const unsigned char STATUS_BUTTON_SCORE_RED_DOWN      = 6;
 const unsigned char STATUS_BUTTON_UPDATE_SCORE        = 7;
 const unsigned char STATUS_BUTTON_UPDATE_TIMER        = 8;
 const unsigned char STATUS_BUTTON_STOP                = 9;
+
 
 #endif

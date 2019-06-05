@@ -18,6 +18,7 @@
 #include <RF24.h>
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#include <RTClib.h>
 #include <printf.h>
 
 
@@ -53,6 +54,9 @@
 #define RADIO_DATARATE RF24_1MBPS
 #define RADIO_PALEVEL  RF24_PA_HIGH
 
+#define LCD_COLUMN_TIMER_MINUTE 7
+#define LCD_COLUMN_TIMER_SECONDS 9
+#define LCD_ROW_TIMER 1
 
 /** Initialize Variables 
  */
@@ -62,17 +66,16 @@ volatile bool flag_tx = false;
 volatile bool flag_fail = false;
 volatile bool flag_rx = false;
 
-const uint8_t STATUS_SPORTSMEN_GREEN            = 1;
-const uint8_t STATUS_SPORTSMEN_RED              = 2;
-
-const uint8_t STATUS_BUTTON_START               = 0;
-const uint8_t STATUS_BUTTON_SCORE_GREEN_UP      = 3;
-const uint8_t STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
-const uint8_t STATUS_BUTTON_SCORE_RED_UP        = 5;
-const uint8_t STATUS_BUTTON_SCORE_RED_DOWN      = 6;
-const uint8_t STATUS_BUTTON_UPDATE_SCORE        = 7;
-const uint8_t STATUS_BUTTON_UPDATE_TIMER        = 8;
-const uint8_t STATUS_BUTTON_STOP                = 9;
+// const uint8_t STATUS_SPORTSMEN_GREEN            = 1;
+// const uint8_t STATUS_SPORTSMEN_RED              = 2;
+// const uint8_t STATUS_BUTTON_START               = 0;
+// const uint8_t STATUS_BUTTON_SCORE_GREEN_UP      = 3;
+// const uint8_t STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
+// const uint8_t STATUS_BUTTON_SCORE_RED_UP        = 5;
+// const uint8_t STATUS_BUTTON_SCORE_RED_DOWN      = 6;
+// const uint8_t STATUS_BUTTON_UPDATE_SCORE        = 7;
+// const uint8_t STATUS_BUTTON_UPDATE_TIMER        = 8;
+// const uint8_t STATUS_BUTTON_STOP                = 9;
 
 const uint8_t STATUS_HIT_GREEN          = 1;
 const uint8_t STATUS_HIT_RED            = 2;
@@ -82,10 +85,21 @@ const uint8_t STATUS_HIT_RED_REMOVE     = 9;
 const uint8_t STATUS_HIT_UPDATE         = 0;
 
 
+//---
+const char ROUND_MINUTE = 2;
+const char ROUND_SECONDS = 60;
+
+uint8_t roundMinute = 0;
+uint8_t roundSecond = 0;
+//--- 
+
+
+
 /** Initialize Objects 
  */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
 LiquidCrystal lcd(PIN_LCD_RS, PIN_LCD_E, PIN_LCD_DB4, PIN_LCD_DB5, PIN_LCD_DB6, PIN_LCD_DB7);
+RTC_DS3231 rtc;
 
 
 /** Настройки радиоканала 
@@ -138,7 +152,7 @@ void displayTemplate()
     lcd.print("GREEN  0:0  RED ");
 
     lcd.setCursor(0, 1);
-    lcd.print("                ");
+    lcd.print("Timer  3:00     ");
 }
 
 /** Инициализия символов на дисплее 
@@ -150,10 +164,10 @@ void displayInitial()
     lcd.begin(2, 16);
 
     lcd.setCursor(0, 0);
-    lcd.print("   Controller   ");
+    lcd.print("Controller V2.1");
 
     lcd.setCursor(0, 1);
-    lcd.print("by Pavel Gromov");
+    lcd.print(" by Pavel Gromov");
 
     // Wait for Serial Console opening
     delay(3000);
@@ -196,13 +210,13 @@ void updateScoreCounter(uint8_t status)
         sportsmenGreen++;
         sportsmenRed++;
     }
-    else if (status == STATUS_HIT_RED)
+    else if (status == STATUS_HIT_GREEN_REMOVE)
     {
-        sportsmenRed++;
+        if (sportsmenGreen > 0) sportsmenGreen--;
     }
-    else if (status == STATUS_HIT_RED)
+    else if (status == STATUS_HIT_RED_REMOVE)
     {
-        sportsmenRed++;
+        if (sportsmenGreen > 0) sportsmenRed--;
     }
     else if (status == STATUS_HIT_UPDATE)
     {
@@ -211,6 +225,27 @@ void updateScoreCounter(uint8_t status)
     }
 
     updateScoreLcd(sportsmenGreen, sportsmenRed);
+}
+
+void initialTimerLcd()
+{
+    lcd.setCursor(0, 1);
+    lcd.print("Timer  3:00     ");
+    
+    roundMinute = 0;
+    roundSecond = 0;
+}
+
+void updateTimerLcd(uint8_t minute, uint8_t seconds)
+{
+    if (seconds != 60) 
+    {
+        lcd.setCursor(LCD_COLUMN_TIMER_MINUTE, LCD_ROW_TIMER);
+        lcd.print(minute);
+
+        lcd.setCursor(LCD_COLUMN_TIMER_SECONDS, LCD_ROW_TIMER);
+        lcd.print(seconds);
+    }
 }
 
 /** Установка начальных значений 
@@ -232,6 +267,15 @@ void setup()
 
     // LCD initial    
     displayInitial();
+
+    // rtc.begin();
+    // rtc.adjust(DateTime(-1, -1, -1, -1, 0, 0));
+
+    rtc.begin();
+    if (rtc.lostPower()) 
+    {
+        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    }
 }
 
 
@@ -246,35 +290,63 @@ void loop()
     if (flag_rx) 
     {
         printf("Flag_RX: true \n"); // TODO: убрать
+        flag_rx = false;
 
         uint8_t receiveStatus = 1000;
         radio.read(&receiveStatus, sizeof(receiveStatus));
+        printf("Status: %d \n", receiveStatus); // TODO: убрать
+
 
         // не уверен, что будет работать
         // возможно стоит изменить прерывание и уже там принимать переменную, а тут просто проверять ее в условия, и обновлять на несуществующий статус
         if (receiveStatus == STATUS_BUTTON_START)
         {
-            while (receiveStatus != STATUS_BUTTON_STOP)
+            rtc.adjust(DateTime(-1, -1, -1, -1, roundMinute, roundSecond));
+
+            while (flag_rx == false)
             {
-                flag_rx = false;
-
-                uint8_t receiveStatus = 0;
-                radio.read(&receiveStatus, sizeof(receiveStatus));
-
-                // FIXME: попытка проверки обоюдных ударов
-                uint8_t beginTime = millis();
-                while (millis() < beginTime + 40)
+                // printf("Fight | time: %d \n", millis());
+                printf("Fight | minute: %d, seconds: %d \n", rtc.now().minute(), rtc.now().second());
+                if (flag_rx)
                 {
-                    if (flag_rx)
-                    {
-                        flag_rx = false;
-                        receiveStatus = 3;   
-                    } 
-                }
-                // ---------------------------------------
+                    flag_rx = false;
 
-                printf("Sportsmen hit status: %d \n", receiveStatus);
-                updateScoreCounter(receiveStatus);
+                    uint8_t receiveStatus = 0;
+                    radio.read(&receiveStatus, sizeof(receiveStatus));
+
+                    if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
+                    {
+                        // FIXME: попытка проверки обоюдных ударов
+                        uint8_t beginTime = millis();
+                        while (millis() < beginTime + 40)
+                        {
+                            if (flag_rx) // TODO: проверка какой статус пришел
+                            {
+                                flag_rx = false;
+                                receiveStatus = 3;   
+                            } 
+                        }
+                        // ---------------------------------------
+
+                        printf("Sportsmen hit status: %d \n", receiveStatus);
+                        updateScoreCounter(receiveStatus);
+
+                        roundMinute = rtc.now().minute();
+                        roundSecond = rtc.now().second();
+
+                        break;
+                    }
+                    else if (receiveStatus == STATUS_BUTTON_STOP)
+                    {
+                        printf("!!! Stop !!!");
+                        
+                        roundMinute = rtc.now().minute();
+                        roundSecond = rtc.now().second();
+
+                        break;
+                    }
+                }
+                updateTimerLcd(ROUND_MINUTE - rtc.now().minute(), ROUND_SECONDS - rtc.now().second());
             } 
         }
         else if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
@@ -293,34 +365,14 @@ void loop()
             }
             // ---------------------------------------
 
-            printf("Sportsmen hit status: %d \n", receiveStatus);
-            updateScoreCounter(receiveStatus);
+            printf("[Test] --> Sportsmen hit status: %d \n", receiveStatus);
         }
-        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP)
-        {
-            updateScoreCounter(STATUS_HIT_GREEN);
-        }
-        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN)
-        {
-            updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
-        }
-        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_UP)
-        {
-            updateScoreCounter(STATUS_HIT_RED);
-        }
-        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_DOWN)
-        {
-            updateScoreCounter(STATUS_HIT_RED_REMOVE);
-        }
-        else if (receiveStatus == STATUS_BUTTON_UPDATE_SCORE)
-        {
-            updateScoreCounter(STATUS_HIT_UPDATE);
-        }
-        else if (receiveStatus == STATUS_BUTTON_UPDATE_TIMER)
-        {
-            // TODO: обновить время
-            // функция для времени
-        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP) updateScoreCounter(STATUS_HIT_GREEN);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN) updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_UP) updateScoreCounter(STATUS_HIT_RED);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_DOWN) updateScoreCounter(STATUS_HIT_RED_REMOVE);
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_SCORE) updateScoreCounter(STATUS_HIT_UPDATE);
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_TIMER) initialTimerLcd();
     }
 
     /** Если данные не отправленны 

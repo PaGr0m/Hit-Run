@@ -7,7 +7,6 @@
 #include <Arduino.h>
 #include <printf.h>
 #include <RF24.h>
-// #include <../../../Hit-Run/Libraries/Settings.h>
 #include <../../Libraries/Settings.h>
 
 
@@ -19,28 +18,31 @@
 #define PIN_NRF_CE  7
 #define PIN_NRF_CSN 8
 
-#define PIN_BUTTON_START                A0
-#define PIN_BUTTON_STOP                 A1
-#define PIN_BUTTON_SCORE_GREEN_UP       A2
-#define PIN_BUTTON_SCORE_GREEN_DOWN     A3
-#define PIN_BUTTON_SCORE_RED_UP         A4
-#define PIN_BUTTON_SCORE_RED_DOWN       A5
-#define PIN_BUTTON_UPDATE_SCORE         A6
-#define PIN_BUTTON_UPDATE_TIMER         A7
+#define PIN_BUTTON_START                A5
+#define PIN_BUTTON_STOP                 6
 
-#define DELAY_TIME 50
+#define PIN_BUTTON_SCORE_GREEN_UP       A4
+#define PIN_BUTTON_SCORE_GREEN_DOWN     A3
+
+#define PIN_BUTTON_SCORE_RED_UP         2
+// #define PIN_BUTTON_SCORE_RED_DOWN       3
+#define PIN_BUTTON_UPDATE_SCORE         4
+#define PIN_BUTTON_UPDATE_TIMER         5
+
+#define DELAY_TIME 1000
 
 
 /** Initialize Variables 
  */
-const uint8_t STATUS_BUTTON_START               = 0;
-const uint8_t STATUS_BUTTON_SCORE_GREEN_UP      = 3;
-const uint8_t STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
-const uint8_t STATUS_BUTTON_SCORE_RED_UP        = 5;
-const uint8_t STATUS_BUTTON_SCORE_RED_DOWN      = 6;
-const uint8_t STATUS_BUTTON_UPDATE_SCORE        = 7;
-const uint8_t STATUS_BUTTON_UPDATE_TIMER        = 8;
-const uint8_t STATUS_BUTTON_STOP                = 9;
+// const uint8_t STATUS_BUTTON_START               = 0;
+// const uint8_t STATUS_BUTTON_STOP                = 9;
+
+// const uint8_t STATUS_BUTTON_SCORE_GREEN_UP      = 3;
+// const uint8_t STATUS_BUTTON_SCORE_GREEN_DOWN    = 4;
+// const uint8_t STATUS_BUTTON_SCORE_RED_UP        = 5;
+// const uint8_t STATUS_BUTTON_SCORE_RED_DOWN      = 6;
+// const uint8_t STATUS_BUTTON_UPDATE_SCORE        = 7;
+// const uint8_t STATUS_BUTTON_UPDATE_TIMER        = 8;
 
 
 /** Initialize Objects 
@@ -79,12 +81,21 @@ void setup()
     // Radio settings
     radioSettings();
 
+    pinMode(PIN_BUTTON_START,               INPUT);
+    pinMode(PIN_BUTTON_STOP,             INPUT);
+    pinMode(PIN_BUTTON_SCORE_GREEN_UP,   INPUT);
+    pinMode(PIN_BUTTON_SCORE_GREEN_DOWN, INPUT);
+    pinMode(PIN_BUTTON_SCORE_RED_UP,     INPUT);
+    // pinMode(STATUS_BUTTON_SCORE_RED_DOWN,   INPUT);
+    pinMode(PIN_BUTTON_UPDATE_SCORE,     INPUT);
+    pinMode(PIN_BUTTON_UPDATE_TIMER,     INPUT);
+
     // Wait for console opening
     delay(3000);
 }
 
 
-void remoteOperation(const uint8_t buttonOperation, String buttonText)
+void remoteOperation(const uint8_t buttonOperation, char *buttonText)
 {
     radio.write(&buttonOperation, sizeof(buttonOperation));
     printf("Button {%s} was clicked!\n", buttonText);
@@ -98,7 +109,7 @@ void loop()
     else if (digitalRead(PIN_BUTTON_SCORE_GREEN_UP) == HIGH)    remoteOperation(STATUS_BUTTON_SCORE_GREEN_UP, "GREEN UP");
     else if (digitalRead(PIN_BUTTON_SCORE_GREEN_DOWN) == HIGH)  remoteOperation(STATUS_BUTTON_SCORE_GREEN_DOWN, "GREEN DOWN");
     else if (digitalRead(PIN_BUTTON_SCORE_RED_UP) == HIGH)      remoteOperation(STATUS_BUTTON_SCORE_RED_UP, "RED UP");
-    else if (digitalRead(PIN_BUTTON_SCORE_RED_DOWN) == HIGH)    remoteOperation(STATUS_BUTTON_SCORE_RED_DOWN, "RED DOWN");
+    // else if (digitalRead(PIN_BUTTON_SCORE_RED_DOWN) == HIGH)    remoteOperation(STATUS_BUTTON_SCORE_RED_DOWN, "RED DOWN");
     else if (digitalRead(PIN_BUTTON_UPDATE_SCORE) == HIGH)      remoteOperation(STATUS_BUTTON_UPDATE_SCORE, "UPDATE SCORE");
     else if (digitalRead(PIN_BUTTON_UPDATE_TIMER) == HIGH)      remoteOperation(STATUS_BUTTON_UPDATE_TIMER, "UPDATE TIMER");
 }

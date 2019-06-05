@@ -1,12 +1,7 @@
 /** TODO TASKS:
- *  Добавить кнопки?
- *      - для обновления счета
- *      - для обновления таймера
- * 
- *  Добавить таймер RTC3231
- *  Добавить .gitignore
- *  Добавить README
+ *      - Добавить README
  */
+
 
 /** Libraries 
  * 
@@ -18,7 +13,9 @@
 #include <RF24.h>
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#include <RTClib.h>
 #include <printf.h>
+#include <../../Libraries/Settings.h>
 
 
 /** Define Pins 
@@ -38,37 +35,41 @@
 
 
 /** Define Variables 
- *  Константы переменных для функций
+ *  Константы переменных
  * 
- *  param: SERIAL
- *  param: RADIO
+ *  param: LCD
  */
-#define SERIAL_BAUDRATE 9600
-
-#define RADIO_CHANNEL    5
-#define RADIO_PIPE_GREEN 1
-#define RADIO_PIPE_RED   2
-#define RADIO_ADDRESS_GREEN 0xAABBCCDD11LL
-#define RADIO_ADDRESS_RED   0xAABBCCDD22LL
-#define RADIO_DATARATE RF24_1MBPS
-#define RADIO_PALEVEL  RF24_PA_HIGH
+#define LCD_COLUMN_TIMER_MINUTE 7
+#define LCD_COLUMN_TIMER_SECONDS 9
+#define LCD_ROW_TIMER 1
 
 
 /** Initialize Variables 
  */
-const uint64_t pipe01 = 0xF0F1F2F3F4LL;
-const uint8_t TIME_DUAL_HIT = 100;
 uint8_t sportsmenGreen;
 uint8_t sportsmenRed;
-volatile boolean flag_tx = false;
-volatile boolean flag_fail = false;
-volatile boolean flag_rx = false;
+volatile bool flag_tx = false;
+volatile bool flag_fail = false;
+volatile bool flag_rx = false;
+
+const uint8_t STATUS_HIT_GREEN          = 1;
+const uint8_t STATUS_HIT_RED            = 2;
+const uint8_t STATUS_HIT_DUAL           = 3;
+const uint8_t STATUS_HIT_GREEN_REMOVE   = 8;
+const uint8_t STATUS_HIT_RED_REMOVE     = 9;
+const uint8_t STATUS_HIT_UPDATE         = 0;
+
+const char ROUND_MINUTE = 2;
+const char ROUND_SECONDS = 60;
+uint8_t roundMinute = 0;
+uint8_t roundSecond = 0;
 
 
 /** Initialize Objects 
  */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
 LiquidCrystal lcd(PIN_LCD_RS, PIN_LCD_E, PIN_LCD_DB4, PIN_LCD_DB5, PIN_LCD_DB6, PIN_LCD_DB7);
+RTC_DS3231 rtc;
 
 
 /** Настройки радиоканала 
@@ -96,7 +97,7 @@ void radioSettings()
     radio.startListening();
 }
 
-// TODO: возможно стоит переделать на tx_ok, tx_fail, rx_ready
+
 /** Обработчик прерывания 
  *  param: flag_tx   --> 1 если успешно отправили данные
  *  param: flag_fail --> 1 если данные не отправленны
@@ -111,7 +112,7 @@ void checkRadioData()
     flag_rx = rx;             
 }
 
-// TODO: добавить таймер
+
 /** Шаблон дисплея 
  *  Визуализация шаблона на дисплее
  */
@@ -121,25 +122,22 @@ void displayTemplate()
     lcd.print("GREEN  0:0  RED ");
 
     lcd.setCursor(0, 1);
-    lcd.print("                ");
+    lcd.print("Timer  3:00     ");
 }
 
 /** Инициализия символов на дисплее 
  *  param: RAW     --> первый параметр setCursor
  *  param: COLLUMN --> второй параметр setCursor
  */
-void displayInitial() 
+void displaySettings() 
 {
     lcd.begin(2, 16);
 
     lcd.setCursor(0, 0);
-    lcd.print("   Controller   ");
+    lcd.print("Controller V2.1");
 
     lcd.setCursor(0, 1);
-    lcd.print("by Pavel Gromov");
-
-    // Wait for Serial Console opening
-    delay(3000);
+    lcd.print(" by Pavel Gromov");
 
     displayTemplate();
 }
@@ -166,22 +164,86 @@ void updateScoreLcd(uint8_t sportsmenGreen, uint8_t sportsmenRed)
  */
 void updateScoreCounter(uint8_t status) 
 {
-    if (status == 1)
+    if (status == STATUS_HIT_GREEN)
     {
         sportsmenGreen++;
     }
-    else if (status == 2)
+    else if (status == STATUS_HIT_RED)
     {
         sportsmenRed++;
     }
-    else if (status == 3)
+    else if (status == STATUS_HIT_DUAL)
     {
         sportsmenGreen++;
         sportsmenRed++;
+    }
+    else if (status == STATUS_HIT_GREEN_REMOVE)
+    {
+        if (sportsmenGreen > 0) sportsmenGreen--;
+    }
+    else if (status == STATUS_HIT_RED_REMOVE)
+    {
+        if (sportsmenGreen > 0) sportsmenRed--;
+    }
+    else if (status == STATUS_HIT_UPDATE)
+    {
+        sportsmenRed = 0;
+        sportsmenGreen = 0;
     }
 
     updateScoreLcd(sportsmenGreen, sportsmenRed);
 }
+
+/** Инициализация таймера на LCD дисплее 
+ */
+void initialTimerLcd()
+{
+    lcd.setCursor(0, 1);
+    lcd.print("Timer  3:00     ");
+    
+    roundMinute = 0;
+    roundSecond = 0;
+}
+
+
+/** Обновление таймера на LCD дисплее 
+ *  param: minute   --> минуты таймера
+ *  param: seconds  --> секунды таймера
+ */
+void updateTimerLcd(uint8_t minute, uint8_t seconds)
+{
+    if (seconds != 60) 
+    {
+        lcd.setCursor(LCD_COLUMN_TIMER_MINUTE, LCD_ROW_TIMER);
+        lcd.print(minute);
+
+        lcd.setCursor(LCD_COLUMN_TIMER_SECONDS, LCD_ROW_TIMER);
+        lcd.print(seconds);
+    }
+}
+
+
+/** Настройки RTC модуля времени 
+ */
+void rtcSettings()
+{
+    rtc.begin();
+    if (rtc.lostPower()) 
+    {
+        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    }
+}
+
+
+/** Настройки serial порта 
+ */
+void serialSettings()
+{
+    Serial.begin(SERIAL_BAUDRATE);
+    printf_begin();
+    printf("\n\r ***** RADIO REMOTE CONTROL ***** \n\r");
+}
+
 
 /** Установка начальных значений 
  */
@@ -192,46 +254,113 @@ void setup()
      *  вызывается функция checkRadioData
      */
     attachInterrupt(0, checkRadioData, FALLING);
-
-    Serial.begin(SERIAL_BAUDRATE);
-    printf_begin();
-    printf("\n\r >>>>> RECEIVER-CONTROLLER <<<<< \n\r");
+    
+    // Serial settings
+    serialSettings();
 
     // Radio settings
     radioSettings();
 
-    // LCD initial    
-    displayInitial();
+    // RTC settings
+    rtcSettings();
+
+    // LCD settings    
+    displaySettings();
+
+    // Wait for console opening
+    delay(3000);
 }
+
 
 /** Бесконечный цикл микроконтроллера 
  */
 void loop() 
 {
-    // Если пришли данные для чтения
-
+    // Если пришли данные для чтения 
     if (flag_rx) 
     {
         printf("Flag_RX: true \n"); // TODO: убрать
         flag_rx = false;
 
-        uint8_t sportsmenStatus = 0;
-        radio.read(&sportsmenStatus, sizeof(sportsmenStatus));
+        uint8_t receiveStatus = 1000;
+        radio.read(&receiveStatus, sizeof(receiveStatus));
+        printf("Status: %d \n", receiveStatus); // TODO: убрать
 
-        // FIXME: попытка проверки обоюдных ударов
-        uint8_t beginTime = millis();
-        while (millis() < beginTime + 40)
+
+        if (receiveStatus == STATUS_BUTTON_START)
         {
-            if (flag_rx)
+            rtc.adjust(DateTime(-1, -1, -1, -1, roundMinute, roundSecond));
+
+            while (flag_rx == false)
             {
-                flag_rx = false;
-                sportsmenStatus = 3;   
+                // printf("Fight | time: %d \n", millis());
+                printf("Fight | minute: %d, seconds: %d \n", rtc.now().minute(), rtc.now().second());
+                if (flag_rx)
+                {
+                    flag_rx = false;
+
+                    uint8_t receiveStatus = 0;
+                    radio.read(&receiveStatus, sizeof(receiveStatus));
+
+                    if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
+                    {
+                        // FIXME: попытка проверки обоюдных ударов
+                        uint8_t beginTime = millis();
+                        while (millis() < beginTime + 40)
+                        {
+                            if (flag_rx) // TODO: проверка какой статус пришел
+                            {
+                                flag_rx = false;
+                                receiveStatus = 3;   
+                            } 
+                        }
+                        // ---------------------------------------
+
+                        printf("Sportsmen hit status: %d \n", receiveStatus);
+                        updateScoreCounter(receiveStatus);
+
+                        roundMinute = rtc.now().minute();
+                        roundSecond = rtc.now().second();
+
+                        break;
+                    }
+                    else if (receiveStatus == STATUS_BUTTON_STOP)
+                    {
+                        printf("!!! Stop !!!");
+                        
+                        roundMinute = rtc.now().minute();
+                        roundSecond = rtc.now().second();
+
+                        break;
+                    }
+                }
+                updateTimerLcd(ROUND_MINUTE - rtc.now().minute(), ROUND_SECONDS - rtc.now().second());
             } 
         }
-        // ---------------------------------------
+        else if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
+        {
+            flag_rx = false;
 
-        printf("Sportsmen hit status: %d \n", sportsmenStatus);
-        updateScoreCounter(sportsmenStatus);
+            // FIXME: попытка проверки обоюдных ударов
+            uint8_t beginTime = millis();
+            while (millis() < beginTime + 40)
+            {
+                if (flag_rx)
+                {
+                    flag_rx = false;
+                    receiveStatus = 3;   
+                } 
+            }
+            // ---------------------------------------
+
+            printf("[Test] --> Sportsmen hit status: %d \n", receiveStatus);
+        }
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP) updateScoreCounter(STATUS_HIT_GREEN);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN) updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_UP) updateScoreCounter(STATUS_HIT_RED);
+        else if (receiveStatus == STATUS_BUTTON_SCORE_RED_DOWN) updateScoreCounter(STATUS_HIT_RED_REMOVE);
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_SCORE) updateScoreCounter(STATUS_HIT_UPDATE);
+        else if (receiveStatus == STATUS_BUTTON_UPDATE_TIMER) initialTimerLcd();
     }
 
     /** Если данные не отправленны 

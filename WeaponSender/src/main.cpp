@@ -1,65 +1,90 @@
+/** Libraries 
+ * 
+ *  TODO: 
+ *      - ссылки на библиотеки
+ *      - переделать путь для Settings
+ */
 #include <Arduino.h>
-
 #include <SPI.h>
+#include <RF24.h>
+#include <nRF24L01.h>
+#include <printf.h>
+#include <../../Libraries/Settings.h>
 
-#include "nRF24L01.h"
-#include "RF24.h"
-#include "printf.h"
 
-#define PIN_NRF_CE  7   // 7 without adapter , 9
-#define PIN_NRF_CSN 8  // 8 without adapter , 10
+/** Define Pins 
+ * 
+ *  param: NRF
+ *  param: Buttons
+ *  param: LED
+ */
+#define PIN_NRF_CE  7
+#define PIN_NRF_CSN 8
+
+#define PIN_BUTTON 2
 
 #define PIN_LED 4
-#define PIN_BUTTON 2
+
 
 /** Sportsmen Colors
  *  1 - GREEN
  *  2 - RED
  */
-const byte SPORTSMEN_COLOR = 1;
+const uint8_t SPORTSMEN_COLOR = 1;
 
 
-// Initialize
+/** Initialize Objects 
+ */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
 
-byte buttonState = 0;
-byte blankMessage = 9;
 
+/** Настройки радиоканала 
+ *  param: RADIO_CHANNEL --> Указываем канал приёма данных (от 0 до 127), 
+ *                           5 - значит приём данных осуществляется на частоте 2,405 ГГц 
+ *                           (на одном канале может быть только 1 приёмник и до 6 передатчиков)
+ *  param: RADIO_DATARATE --> Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), 
+ *                            RF24_1MBPS - 1Мбит/сек
+ *  param: RADIO_PALEVEL --> Указываем мощность передатчика 
+ *                           (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+ */
+void radioSettings() 
+{
+     
+    radio.begin();
+    radio.setChannel(RADIO_CHANNEL);  
+    radio.setDataRate(RADIO_DATARATE);  
+    radio.setPALevel(RADIO_PALEVEL);    
+    radio.openWritingPipe(RADIO_ADDRESS_GREEN);
+    radio.printDetails();
+}
 
 // Setup
-void setup() {
+void setup()
+{
+    // Serial settings
+    Serial.begin(SERIAL_BAUDRATE);
+    printf_begin();
+    printf("\n\r <<--- SENDER --->> \n\r");
 
-        // Serial settings
-        Serial.begin(9600);
-        printf_begin();
-        printf("\n\r <<--- SENDER --->> \n\r");
+    // Radio settings
+    radioSettings();
 
-        // Radio settings
-        radio.begin();
-        radio.setChannel(5);                      // Указываем канал передачи данных (от 0 до 127), 5 - значит передача данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
-        radio.setDataRate(RF24_1MBPS);            // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
-        radio.setPALevel(RF24_PA_HIGH);           // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
-        radio.openWritingPipe(0xAABBCCDD11LL);    // NANO
-        // radio.openWritingPipe (0xAABBCCDD22LL);   // UNO
-
-        // Wait for console opening
-        delay(3000);
-
+    // Wait for console opening
+    delay(3000);
 }
 
 
+// TODO: Убрать светодиоды
 // Loop
-void loop() {
-
+void loop() 
+{
     /*
     Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
     */
-    buttonState = digitalRead(PIN_BUTTON);
-
-    if (buttonState == HIGH)
+    if (digitalRead(PIN_BUTTON) == HIGH)
     {
         radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
-        printf("Button clicked!\n");
+        printf("Button {%d} clicked!\n", SPORTSMEN_COLOR);
         digitalWrite(PIN_LED, HIGH);
         delay(2000);
         digitalWrite(PIN_LED, LOW);

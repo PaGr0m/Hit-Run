@@ -7,7 +7,8 @@
 #include <Arduino.h>
 #include <printf.h>
 #include <RF24.h>
-#include <C:\Users\PaGrom\Desktop\Hit&Run\Libraries\Settings.h>
+// #include <../../../Hit-Run/Libraries/Settings.h>
+#include <../../Libraries/Settings.h>
 
 
 /** Define Pins 
@@ -23,7 +24,7 @@
 #define PIN_BUTTON_SCORE_GREEN_UP       A2
 #define PIN_BUTTON_SCORE_GREEN_DOWN     A3
 #define PIN_BUTTON_SCORE_RED_UP         A4
-#define PIN_BUTTON_SCORE_RED_DPWN       A5
+#define PIN_BUTTON_SCORE_RED_DOWN       A5
 #define PIN_BUTTON_UPDATE_SCORE         A6
 #define PIN_BUTTON_UPDATE_TIMER         A7
 
@@ -83,6 +84,28 @@ void setup()
 }
 
 
+void remoteOperation(const uint8_t buttonOperation, String buttonText)
+{
+    radio.write(&buttonOperation, sizeof(buttonOperation));
+    printf("Button {%s} was clicked!\n", buttonText);
+    delay(DELAY_TIME);
+}
+
+void loop() 
+{
+    if (digitalRead(PIN_BUTTON_START) == HIGH)                  remoteOperation(STATUS_BUTTON_START, "START");
+    else if (digitalRead(PIN_BUTTON_STOP) == HIGH)              remoteOperation(STATUS_BUTTON_STOP, "STOP");
+    else if (digitalRead(PIN_BUTTON_SCORE_GREEN_UP) == HIGH)    remoteOperation(STATUS_BUTTON_SCORE_GREEN_UP, "GREEN UP");
+    else if (digitalRead(PIN_BUTTON_SCORE_GREEN_DOWN) == HIGH)  remoteOperation(STATUS_BUTTON_SCORE_GREEN_DOWN, "GREEN DOWN");
+    else if (digitalRead(PIN_BUTTON_SCORE_RED_UP) == HIGH)      remoteOperation(STATUS_BUTTON_SCORE_RED_UP, "RED UP");
+    else if (digitalRead(PIN_BUTTON_SCORE_RED_DOWN) == HIGH)    remoteOperation(STATUS_BUTTON_SCORE_RED_DOWN, "RED DOWN");
+    else if (digitalRead(PIN_BUTTON_UPDATE_SCORE) == HIGH)      remoteOperation(STATUS_BUTTON_UPDATE_SCORE, "UPDATE SCORE");
+    else if (digitalRead(PIN_BUTTON_UPDATE_TIMER) == HIGH)      remoteOperation(STATUS_BUTTON_UPDATE_TIMER, "UPDATE TIMER");
+}
+
+
+
+/* -------------------------------------------------------------------------------------------------------------------------
 // TODO: возможно стоит убрать delay
 void loop() 
 {
@@ -135,3 +158,4 @@ void loop()
         delay(DELAY_TIME);
     }
 }
+*/

@@ -1,29 +1,40 @@
+/** Libraries 
+ * 
+ *  TODO: 
+ *      - ссылки на библиотеки
+ *      - переделать путь для Settings
+ */
 #include <Arduino.h>
-
 #include <SPI.h>
+#include <RF24.h>
+#include <nRF24L01.h>
+#include <printf.h>
 
-#include "nRF24L01.h"
-#include "RF24.h"
-#include "printf.h"
 
-#define PIN_NRF_CE  7   // 7 without adapter , 9
-#define PIN_NRF_CSN 8  // 8 without adapter , 10
+/** Define Pins 
+ * 
+ *  param: NRF
+ *  param: Buttons
+ *  param: LED
+ */
+#define PIN_NRF_CE  7
+#define PIN_NRF_CSN 8
+
+#define PIN_BUTTON 2
 
 #define PIN_LED 4
-#define PIN_BUTTON 2
+
 
 /** Sportsmen Colors
  *  1 - GREEN
  *  2 - RED
  */
-const byte SPORTSMEN_COLOR = 1;
+const uint8_t SPORTSMEN_COLOR = 1;
 
 
-// Initialize
+/** Initialize Objects 
+ */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
-
-byte buttonState = 0;
-byte blankMessage = 9;
 
 
 // Setup
@@ -44,22 +55,20 @@ void setup() {
 
         // Wait for console opening
         delay(3000);
-
 }
 
 
+// TODO: Убрать светодиоды
 // Loop
-void loop() {
-
+void loop() 
+{
     /*
     Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
     */
-    buttonState = digitalRead(PIN_BUTTON);
-
-    if (buttonState == HIGH)
+    if (digitalRead(PIN_BUTTON) == HIGH)
     {
         radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
-        printf("Button clicked!\n");
+        printf("Button {%d} clicked!\n", SPORTSMEN_COLOR);
         digitalWrite(PIN_LED, HIGH);
         delay(2000);
         digitalWrite(PIN_LED, LOW);

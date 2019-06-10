@@ -1,5 +1,6 @@
 /** TODO TASKS:
- *      - Добавить README
+ *      - добавить README
+ *      - добавить buzzer и led matrix
  */
 
 
@@ -107,9 +108,10 @@ void checkRadioData()
 {
     bool tx, fail, rx;
     radio.whatHappened(tx, fail, rx);
-    flag_tx = tx;               
-    flag_fail = fail;            
-    flag_rx = rx;             
+    flag_tx = tx;
+    flag_fail = fail;
+    flag_rx = rx;
+    printf("[%ld] [INTERRUPT] --- Receive data\n", millis());
 }
 
 
@@ -156,7 +158,6 @@ void updateScoreLcd(uint8_t sportsmenGreen, uint8_t sportsmenRed)
 }
 
 /** Обновление счетчика уколов 
- *  TODO: ОПИСАНИЕ СТАТУСОВ
  *  param: status 
  *      --> 1 - укол присуждается зеленому спортсмену
  *      --> 2 - укол присуждается красному спортсмену
@@ -241,7 +242,7 @@ void serialSettings()
 {
     Serial.begin(SERIAL_BAUDRATE);
     printf_begin();
-    printf("\n\r ***** RADIO REMOTE CONTROL ***** \n\r");
+    printf("[%ld] [MAIN] --- ***** RADIO REMOTE CONTROL *****\n", millis());
 }
 
 
@@ -279,12 +280,12 @@ void loop()
     // Если пришли данные для чтения 
     if (flag_rx) 
     {
-        printf("Flag_RX: true \n"); // TODO: убрать
+        printf("[%ld] [DEBUG] --- Flag_RX: true\n", millis()); // TODO: убрать
         flag_rx = false;
 
-        uint8_t receiveStatus = 1000;
+        uint8_t receiveStatus = 255;
         radio.read(&receiveStatus, sizeof(receiveStatus));
-        printf("Status: %d \n", receiveStatus); // TODO: убрать
+        printf("[%ld] [DEBUG] --- Receive status: %d\n", millis(), receiveStatus); // TODO: убрать
 
 
         if (receiveStatus == STATUS_BUTTON_START)
@@ -294,7 +295,7 @@ void loop()
             while (flag_rx == false)
             {
                 // printf("Fight | time: %d \n", millis());
-                printf("Fight | minute: %d, seconds: %d \n", rtc.now().minute(), rtc.now().second());
+                printf("[%ld] [INFO] --- Fight (minute: %d, seconds: %d)\n", millis(), rtc.now().minute(), rtc.now().second());
                 if (flag_rx)
                 {
                     flag_rx = false;
@@ -305,6 +306,8 @@ void loop()
                     if (receiveStatus == STATUS_SPORTSMEN_GREEN || receiveStatus == STATUS_SPORTSMEN_RED)
                     {
                         // FIXME: попытка проверки обоюдных ударов
+                        // проблема millis() в том, что оно выводит long значение от - до +
+                        // следовательно, возможен случай, когда 30000 < -30000 + 40
                         uint8_t beginTime = millis();
                         while (millis() < beginTime + 40)
                         {
@@ -316,7 +319,7 @@ void loop()
                         }
                         // ---------------------------------------
 
-                        printf("Sportsmen hit status: %d \n", receiveStatus);
+                        printf("[%ld] [DEBUG] --- Sportsmen hit status: %d\n", millis(), receiveStatus);
                         updateScoreCounter(receiveStatus);
 
                         roundMinute = rtc.now().minute();
@@ -326,7 +329,7 @@ void loop()
                     }
                     else if (receiveStatus == STATUS_BUTTON_STOP)
                     {
-                        printf("!!! Stop !!!");
+                        printf("[%ld] [INFO] --- !!! Stop fight !!!\n", millis());
                         
                         roundMinute = rtc.now().minute();
                         roundSecond = rtc.now().second();
@@ -353,7 +356,7 @@ void loop()
             }
             // ---------------------------------------
 
-            printf("[Test] --> Sportsmen hit status: %d \n", receiveStatus);
+            printf("[%ld] [INFO] --- Test sportsmen hit status: %d\n", millis(), receiveStatus);
         }
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP) updateScoreCounter(STATUS_HIT_GREEN);
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN) updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
@@ -368,7 +371,7 @@ void loop()
      */
     if (flag_fail)
     {
-        printf("Flag_fail : данные не отправлены \n");
+        printf("[%ld] [DEBUG] --- Flag_fail: данные не отправлены\n", millis());
         flag_fail = 0;
     }
 
@@ -377,7 +380,7 @@ void loop()
      */
     if (flag_tx)
     {
-        printf("Flag_tx : данные отправлены \n");
+        printf("[%ld] [DEBUG] --- Flag_tx: данные отправлены \n", millis());
         flag_tx = 0;
     }
 }

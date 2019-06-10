@@ -64,7 +64,7 @@ void setup()
     // Serial settings
     Serial.begin(SERIAL_BAUDRATE);
     printf_begin();
-    printf("\n\r <<--- SENDER --->> \n\r");
+    printf("[%ld] [MAIN] --- <<--- SENDER --->>\n", millis());
 
     // Radio settings
     radioSettings();
@@ -84,7 +84,7 @@ void loop()
     if (digitalRead(PIN_BUTTON) == HIGH)
     {
         radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
-        printf("Button {%d} clicked!\n", SPORTSMEN_COLOR);
+        printf("[%ld] [INFO] --- Button {%d} clicked!\n", millis(), SPORTSMEN_COLOR);
         digitalWrite(PIN_LED, HIGH);
         delay(2000);
         digitalWrite(PIN_LED, LOW);

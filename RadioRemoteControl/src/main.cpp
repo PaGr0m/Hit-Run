@@ -2,6 +2,7 @@
  * 
  *  TODO: 
  *      - ссылки на библиотеки
+ *      - подумать про брезг кнопки
  */
 #include <Arduino.h>
 #include <printf.h>
@@ -67,7 +68,7 @@ void radioSettings()
 void remoteOperation(const uint8_t buttonOperation, char *buttonText)
 {
     radio.write(&buttonOperation, sizeof(buttonOperation));
-    printf("Button {%s} was clicked!\n", buttonText);
+    printf("[%ld] [INFO] --- Button {%s} was clicked!\n", millis(), buttonText);
     delay(DELAY_TIME);
 }
 
@@ -78,7 +79,7 @@ void serialSettings()
 {
     Serial.begin(SERIAL_BAUDRATE);
     printf_begin();
-    printf("\n\r ***** RADIO REMOTE CONTROL ***** \n\r");
+    printf("[%ld] [MAIN] --- ***** RADIO REMOTE CONTROL ***** \n", millis());
 }
 
 

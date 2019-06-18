@@ -1,6 +1,6 @@
 # Hit&Run
 
-[![N|PaGrom](https://github.com/PaGr0m/Hit-Run/tree/develop/Screenshots/SKB.png)]()
+[![N|PaGrom](https://github.com/PaGr0m/Hit-Run/blob/feature/readme/Screenshots/SKB.png)]()
 
 <!-- [![N|PaGrom](http://www.dvgups.ru/templates/festu2015/img/logo.png)](https://vk.com/pagr0m)
 
@@ -15,3 +15,6 @@
 [Controller]: <https://github.com/PaGr0m/Hit-Run/tree/master/Controller>
 [WeaponSender]: <https://github.com/PaGr0m/Hit-Run/tree/master/WeaponSender>
 [RadioRemoteControl]: <https://github.com/PaGr0m/Hit-Run/tree/master/RadioRemoteControl>
+
+
+<!-- Обновить ссылки на master!!! -->

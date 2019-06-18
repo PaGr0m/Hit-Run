@@ -1,6 +1,5 @@
 # Hit&Run
 
-[![N|PaGrom](https://github.com/PaGr0m/Hit-Run/blob/feature/readme/Screenshots/SKB.png)]()
 
 <!-- [![N|PaGrom](http://www.dvgups.ru/templates/festu2015/img/logo.png)](https://vk.com/pagr0m)
 
@@ -12,9 +11,20 @@
 * [RadioRemoteControl] --- пульт ДУ, для усправления контроллером.
 
 
-[Controller]: <https://github.com/PaGr0m/Hit-Run/tree/master/Controller>
-[WeaponSender]: <https://github.com/PaGr0m/Hit-Run/tree/master/WeaponSender>
-[RadioRemoteControl]: <https://github.com/PaGr0m/Hit-Run/tree/master/RadioRemoteControl>
+
+# License
+Данный проект создан на базе СКБ в ДВГУПСе
+
+Программист - Громов Павел
+Электроника - Поваров Николай
+Иженерный дизайн - Кушнир Елизавета
+
+[![SKB]]()
 
 
 <!-- Обновить ссылки на master!!! -->
+
+[Controller]: <https://github.com/PaGr0m/Hit-Run/tree/master/Controller>
+[WeaponSender]: <https://github.com/PaGr0m/Hit-Run/tree/master/WeaponSender>
+[RadioRemoteControl]: <https://github.com/PaGr0m/Hit-Run/tree/master/RadioRemoteControl>
+[SKB]: <https://github.com/PaGr0m/Hit-Run/blob/feature/readme/Screenshots/SKB.png>

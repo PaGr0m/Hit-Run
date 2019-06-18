@@ -1,8 +1,10 @@
 # Hit&Run
 
-[![N|PaGrom](http://www.dvgups.ru/templates/festu2015/img/logo.png)](https://vk.com/pagr0m)
+[![N|PaGrom](https://github.com/PaGr0m/Hit-Run/tree/develop/Screenshots/SKB.png)]()
 
-[![N|PaGrom](https://vk.com/images/svg_icons/ic_head_logo.png)](https://vk.com/pagr0m)
+<!-- [![N|PaGrom](http://www.dvgups.ru/templates/festu2015/img/logo.png)](https://vk.com/pagr0m)
+
+[![N|PaGrom](https://vk.com/images/svg_icons/ic_head_logo.png)](https://vk.com/pagr0m) -->
 
 ## Projects
 * [Controller] --- устройство-приемник, обрабатывает приходящие сигналы, визуализирует фиксацию, оснащен таймером.

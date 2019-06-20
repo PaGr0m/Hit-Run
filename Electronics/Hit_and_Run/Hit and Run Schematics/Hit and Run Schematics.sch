@@ -1,0 +1,317 @@
+EESchema Schematic File Version 4
+LIBS:Hit and Run Schematics-cache
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Hit-and-Run-Schematics-rescue:+5V-power #PWR0101
+U 1 1 5CFE06E9
+P 5780 2530
+F 0 "#PWR0101" H 5780 2380 50  0001 C CNN
+F 1 "+5V" H 5795 2703 50  0000 C CNN
+F 2 "" H 5780 2530 50  0001 C CNN
+F 3 "" H 5780 2530 50  0001 C CNN
+	1    5780 2530
+	1    0    0    -1  
+$EndComp
+$Comp
+L Hit-and-Run-Schematics-rescue:+3.3V-power #PWR0102
+U 1 1 5CFE073D
+P 8230 4030
+F 0 "#PWR0102" H 8230 3880 50  0001 C CNN
+F 1 "+3.3V" H 8245 4203 50  0000 C CNN
+F 2 "" H 8230 4030 50  0001 C CNN
+F 3 "" H 8230 4030 50  0001 C CNN
+	1    8230 4030
+	1    0    0    -1  
+$EndComp
+$Comp
+L Hit-and-Run-Schematics-rescue:GND-power #PWR0103
+U 1 1 5CFE0775
+P 5780 3890
+F 0 "#PWR0103" H 5780 3640 50  0001 C CNN
+F 1 "GND" H 5785 3717 50  0000 C CNN
+F 2 "" H 5780 3890 50  0001 C CNN
+F 3 "" H 5780 3890 50  0001 C CNN
+	1    5780 3890
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9200 2550 9000 2550
+NoConn ~ 9900 2550
+$Comp
+L Hit-and-Run-Schematics-rescue:+BATT-power #PWR0106
+U 1 1 5CFE0CED
+P 8200 2700
+F 0 "#PWR0106" H 8200 2550 50  0001 C CNN
+F 1 "+BATT" H 8215 2873 50  0000 C CNN
+F 2 "" H 8200 2700 50  0001 C CNN
+F 3 "" H 8200 2700 50  0001 C CNN
+	1    8200 2700
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Hit-and-Run-Schematics-rescue:-BATT-power #PWR0107
+U 1 1 5CFE0CF3
+P 8450 2700
+F 0 "#PWR0107" H 8450 2550 50  0001 C CNN
+F 1 "-BATT" H 8465 2873 50  0000 C CNN
+F 2 "" H 8450 2700 50  0001 C CNN
+F 3 "" H 8450 2700 50  0001 C CNN
+	1    8450 2700
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	8200 2750 8200 2700
+Wire Wire Line
+	8450 2850 8450 2700
+Wire Wire Line
+	8050 2850 8450 2850
+Wire Wire Line
+	8050 2750 8200 2750
+Wire Wire Line
+	5780 3890 5780 3690
+Wire Wire Line
+	8050 4050 8230 4050
+Wire Wire Line
+	8230 4050 8230 4030
+$Comp
+L Hit-and-Run-Schematics-rescue:GND-power #PWR0108
+U 1 1 5CFE1794
+P 8450 2940
+F 0 "#PWR0108" H 8450 2690 50  0001 C CNN
+F 1 "GND" H 8455 2767 50  0000 C CNN
+F 2 "" H 8450 2940 50  0001 C CNN
+F 3 "" H 8450 2940 50  0001 C CNN
+	1    8450 2940
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8450 2940 8450 2850
+Connection ~ 8450 2850
+$Comp
+L Hit-and-Run-Schematics-rescue:+3.3V-power #PWR0110
+U 1 1 5CFE1F5B
+P 6620 4530
+F 0 "#PWR0110" H 6620 4380 50  0001 C CNN
+F 1 "+3.3V" H 6635 4703 50  0000 C CNN
+F 2 "" H 6620 4530 50  0001 C CNN
+F 3 "" H 6620 4530 50  0001 C CNN
+	1    6620 4530
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6620 4550 6620 4530
+Wire Wire Line
+	6520 3750 6520 4650
+Wire Wire Line
+	6700 3650 5930 3650
+Wire Wire Line
+	5930 3650 5930 4350
+Wire Wire Line
+	5930 4350 5500 4350
+Wire Wire Line
+	5500 4350 5500 4650
+Wire Wire Line
+	8050 4150 8230 4150
+Wire Wire Line
+	8230 4150 8230 5045
+Wire Wire Line
+	8230 5045 5500 5045
+Wire Wire Line
+	5500 5045 5500 4750
+Wire Wire Line
+	6560 4050 6560 4750
+Wire Wire Line
+	6560 4050 6700 4050
+Wire Wire Line
+	6700 4150 6680 4150
+Wire Wire Line
+	6680 4150 6680 5000
+Wire Wire Line
+	6680 5000 5560 5000
+Wire Wire Line
+	5560 5000 5560 4850
+NoConn ~ 8050 3150
+NoConn ~ 8050 3250
+NoConn ~ 8050 3350
+NoConn ~ 8050 3450
+NoConn ~ 8050 3550
+NoConn ~ 8050 3650
+NoConn ~ 8050 3750
+NoConn ~ 6700 3850
+NoConn ~ 6700 3550
+NoConn ~ 8050 2950
+NoConn ~ 6700 3450
+NoConn ~ 6700 3350
+NoConn ~ 6700 3050
+NoConn ~ 6700 2950
+NoConn ~ 6700 2850
+NoConn ~ 6700 2750
+NoConn ~ 8050 3950
+Wire Wire Line
+	8050 3850 8200 3850
+Wire Wire Line
+	8200 3850 8200 2750
+Connection ~ 8200 2750
+NoConn ~ 7150 2600
+NoConn ~ 7250 2600
+NoConn ~ 7350 2600
+NoConn ~ 7450 2600
+NoConn ~ 7550 2600
+NoConn ~ 7650 2600
+$Comp
+L Hit-and-Run-Schematics-rescue:GND-power #PWR0109
+U 1 1 5CFFA3FE
+P 5280 4690
+F 0 "#PWR0109" H 5280 4440 50  0001 C CNN
+F 1 "GND" H 5285 4517 50  0000 C CNN
+F 2 "" H 5280 4690 50  0001 C CNN
+F 3 "" H 5280 4690 50  0001 C CNN
+	1    5280 4690
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5280 4690 5280 4550
+NoConn ~ 6700 3950
+Wire Wire Line
+	6470 3250 6470 4850
+Wire Wire Line
+	6470 3250 6700 3250
+Wire Wire Line
+	6520 3750 6700 3750
+$Comp
+L Hit-and-Run-Schematics-rescue:+5V-power #PWR0111
+U 1 1 5CFE7243
+P 8270 3050
+F 0 "#PWR0111" H 8270 2900 50  0001 C CNN
+F 1 "+5V" H 8285 3223 50  0000 C CNN
+F 2 "" H 8270 3050 50  0001 C CNN
+F 3 "" H 8270 3050 50  0001 C CNN
+	1    8270 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8050 3050 8270 3050
+Wire Wire Line
+	5780 2530 5780 2630
+$Comp
+L CustomButtons:THT_Tactical_Switch_6x6x3.5mm SW1
+U 1 1 5CFE048A
+P 5780 2770
+F 0 "SW1" H 5930 2844 50  0000 C CNN
+F 1 "THT_Tactical_Switch_6x6x3.5mm" H 6020 2620 50  0001 C CNN
+F 2 "CustomButtons:THT_Tactical_Switch_6x6x3.5" H 5880 2820 50  0001 C CNN
+F 3 "" H 5880 2820 50  0001 C CNN
+	1    5780 2770
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6700 3150 5780 3150
+Wire Wire Line
+	5780 2910 5780 3150
+Connection ~ 5780 3150
+Wire Wire Line
+	8750 2650 9200 2650
+Wire Wire Line
+	9000 2550 9000 2500
+Wire Wire Line
+	8750 2650 8750 2500
+$Comp
+L Hit-and-Run-Schematics-rescue:+BATT-power #PWR0104
+U 1 1 5CFE07AD
+P 9000 2500
+F 0 "#PWR0104" H 9000 2350 50  0001 C CNN
+F 1 "+BATT" H 9015 2673 50  0000 C CNN
+F 2 "" H 9000 2500 50  0001 C CNN
+F 3 "" H 9000 2500 50  0001 C CNN
+	1    9000 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Hit-and-Run-Schematics-rescue:-BATT-power #PWR0105
+U 1 1 5CFE07FA
+P 8750 2500
+F 0 "#PWR0105" H 8750 2350 50  0001 C CNN
+F 1 "-BATT" H 8765 2673 50  0000 C CNN
+F 2 "" H 8750 2500 50  0001 C CNN
+F 3 "" H 8750 2500 50  0001 C CNN
+	1    8750 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5560 4850 5600 4850
+Wire Wire Line
+	5500 4750 5600 4750
+Wire Wire Line
+	5500 4650 5600 4650
+Wire Wire Line
+	5280 4550 5600 4550
+Wire Wire Line
+	6470 4850 6450 4850
+Wire Wire Line
+	6560 4750 6450 4750
+Wire Wire Line
+	6450 4650 6520 4650
+Wire Wire Line
+	6450 4550 6620 4550
+Wire Wire Line
+	5780 3150 5780 3240
+$Comp
+L CustomModules:nRF24L01 D2
+U 1 1 5CFFA01E
+P 6025 4700
+F 0 "D2" H 6025 4950 50  0000 C CNN
+F 1 "nRF24L01" H 6000 4450 50  0000 C CNN
+F 2 "CustomModules:nRF24L01" H 6025 4950 50  0001 C CNN
+F 3 "" H 6025 4950 50  0001 C CNN
+	1    6025 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L CustomArduino:Arduino_Nano U1
+U 1 1 5CFFF51D
+P 7350 3450
+F 0 "U1" H 6850 4300 50  0000 C CNN
+F 1 "Arduino_Nano" H 7350 2650 50  0000 C CNN
+F 2 "CustomArduino:Arduino_Nano" H 6850 4300 50  0001 C CNN
+F 3 "https://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf" H 6850 4300 50  0001 C CNN
+	1    7350 3450
+	1    0    0    -1  
+$EndComp
+NoConn ~ 9900 2650
+$Comp
+L CustomModules:TC4056A_Battery_module D1
+U 1 1 5D006489
+P 9550 2600
+F 0 "D1" H 9550 2800 50  0000 C CNN
+F 1 "TC4056A_Battery_module" H 9600 2400 50  0000 C CNN
+F 2 "CustomModules:TC4056A_Battery_module" H 9475 2750 50  0001 C CNN
+F 3 "" H 9475 2750 50  0001 C CNN
+	1    9550 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L CustomResistors:Default_Resistor R1
+U 1 1 5D0080F3
+P 5780 3465
+F 0 "R1" H 5780 3565 50  0000 C CNN
+F 1 "Default_Resistor" H 5805 3365 50  0001 C CNN
+F 2 "CustomResistors:SMD_Resistor_1206" H 5780 3565 50  0001 C CNN
+F 3 "" H 5780 3565 50  0001 C CNN
+F 4 "10k" H 5780 3365 50  0000 C CNN "Value"
+	1    5780 3465
+	0    -1   -1   0   
+$EndComp
+$EndSCHEMATC

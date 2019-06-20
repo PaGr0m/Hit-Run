@@ -1,0 +1,8 @@
+(sym_lib_table
+  (lib (name CustomArduino)(type Legacy)(uri ${KICAD_CUSTOM_LIBS}/CustomArduino.lib)(options "")(descr ""))
+  (lib (name CustomButtons)(type Legacy)(uri ${KICAD_CUSTOM_LIBS}/CustomButtons.lib)(options "")(descr ""))
+  (lib (name CustomModules)(type Legacy)(uri ${KICAD_CUSTOM_LIBS}/CustomModules.lib)(options "")(descr ""))
+  (lib (name CustomResistors)(type Legacy)(uri ${KICAD_CUSTOM_LIBS}/CustomResistors.lib)(options "")(descr ""))
+  (lib (name Hit-and-Run-Schematics-rescue)(type Legacy)(uri "${KIPRJMOD}/Hit and Run Schematics-rescue.lib")(options "")(descr ""))
+  (lib (name power)(type Legacy)(uri ${KICAD_SYMBOL_DIR}/power.lib)(options "")(descr ""))
+)

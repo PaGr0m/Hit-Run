@@ -1,0 +1,206 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# CustomArduino_Arduino_Nano
+#
+DEF CustomArduino_Arduino_Nano U 0 40 Y Y 1 F N
+F0 "U" -500 850 50 H V C CNN
+F1 "CustomArduino_Arduino_Nano" 0 -800 50 H V C CNN
+F2 "" -500 850 50 H I C CNN
+F3 "" -500 850 50 H I C CNN
+$FPLIST
+ Arduino_Nano
+$ENDFPLIST
+DRAW
+S -550 750 600 -750 0 1 0 f
+X D1/TX 1 -650 700 100 R 50 50 1 1 O
+X D7 10 -650 -200 100 R 50 50 1 1 I
+X D8 11 -650 -300 100 R 50 50 1 1 W
+X D9 12 -650 -400 100 R 50 50 1 1 B
+X D10/SS 13 -650 -500 100 R 50 50 1 1 B
+X D11/MOSI 14 -650 -600 100 R 50 50 1 1 B
+X D12/MISO 15 -650 -700 100 R 50 50 1 1 B
+X D13/SCK 16 700 -700 100 L 50 50 1 1 B
+X 3V3 17 700 -600 100 L 50 50 1 1 w
+X AREF 18 700 -500 100 L 50 50 1 1 I
+X A0 19 700 -400 100 L 50 50 1 1 B
+X D0/RX 2 -650 600 100 R 50 50 1 1 I
+X A1 20 700 -300 100 L 50 50 1 1 W
+X A2 21 700 -200 100 L 50 50 1 1 I
+X A3 22 700 -100 100 L 50 50 1 1 I
+X A4/SDA 23 700 0 100 L 50 50 1 1 O
+X A5/SCL 24 700 100 100 L 50 50 1 1 B
+X A6 25 700 200 100 L 50 50 1 1 B
+X A7 26 700 300 100 L 50 50 1 1 B
+X 5V 27 700 400 100 L 50 50 1 1 w
+X RESET 28 700 500 100 L 50 50 1 1 I
+X GND 29 700 600 100 L 50 50 1 1 W
+X RESET 3 -650 500 100 R 50 50 1 1 I
+X VIN 30 700 700 100 L 50 50 1 1 W
+X RESET 31 300 850 100 D 50 50 1 1 I
+X SCK 32 200 850 100 D 50 50 1 1 B
+X MISO 33 100 850 100 D 50 50 1 1 B
+X GND 34 0 850 100 D 50 50 1 1 W
+X MOSI 35 -100 850 100 D 50 50 1 1 B
+X 5V 36 -200 850 100 D 50 50 1 1 w
+X GND 4 -650 400 100 R 50 50 1 1 W
+X D2/INT0 5 -650 300 100 R 50 50 1 1 B
+X D3/INT1 6 -650 200 100 R 50 50 1 1 B
+X D4 7 -650 100 100 R 50 50 1 1 B
+X D5 8 -650 0 100 R 50 50 1 1 O
+X D6 9 -650 -100 100 R 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+# CustomButtons_THT_Tactical_Switch_6x6x3.5mm
+#
+DEF CustomButtons_THT_Tactical_Switch_6x6x3.5mm SW 0 40 N Y 1 F N
+F0 "SW" 0 100 50 H V C CNN
+F1 "CustomButtons_THT_Tactical_Switch_6x6x3.5mm" 90 -100 50 H I C CNN
+F2 "" 0 100 50 H I C CNN
+F3 "" 0 100 50 H I C CNN
+$FPLIST
+ THT_Tactical_Switch*
+$ENDFPLIST
+DRAW
+C -30 0 10 0 1 0 N
+C 30 0 10 0 1 0 N
+P 2 0 1 0 -40 50 40 50 N
+X ~ 1 -140 0 100 R 50 50 1 1 B
+X ~ 2 140 0 100 L 50 50 1 1 B
+ENDDRAW
+ENDDEF
+#
+# CustomModules_TC4056A_Battery_module
+#
+DEF CustomModules_TC4056A_Battery_module D 0 40 Y Y 1 F N
+F0 "D" 0 200 50 H V C CNN
+F1 "CustomModules_TC4056A_Battery_module" 50 -200 50 H V C CNN
+F2 "" -75 150 50 H I C CNN
+F3 "" -75 150 50 H I C CNN
+$FPLIST
+ TC4056A_Battery_Module*
+$ENDFPLIST
+DRAW
+S -250 150 250 -150 0 1 0 f
+X IN+ 1 -350 50 100 R 50 50 1 1 W
+X IN- 2 -350 -50 100 R 50 50 1 1 W
+X BAT- 3 350 -50 100 L 50 50 1 1 w
+X BAT+ 4 350 50 100 L 50 50 1 1 w
+ENDDRAW
+ENDDEF
+#
+# CustomModules_nRF24L01
+#
+DEF CustomModules_nRF24L01 D 0 40 Y Y 1 F N
+F0 "D" 0 250 50 H V C CNN
+F1 "CustomModules_nRF24L01" -25 -250 50 H V C CNN
+F2 "" 0 250 50 H I C CNN
+F3 "" 0 250 50 H I C CNN
+$FPLIST
+ nRF24L01
+$ENDFPLIST
+DRAW
+S -325 200 325 -200 0 1 0 f
+X GND 1 -425 150 100 R 50 50 1 1 W
+X CE 2 -425 50 100 R 50 50 1 1 I
+X SCK 3 -425 -50 100 R 50 50 1 1 B
+X MISO 4 -425 -150 100 R 50 50 1 1 B
+X IRQ 5 425 -150 100 L 50 50 1 1 O
+X MOSI 6 425 -50 100 L 50 50 1 1 B
+X CSN 7 425 50 100 L 50 50 1 1 B
+X VCC 8 425 150 100 L 50 50 1 1 W
+ENDDRAW
+ENDDEF
+#
+# CustomResistors_Default_Resistor
+#
+DEF CustomResistors_Default_Resistor R 0 0 N Y 1 F N
+F0 "R" 0 100 50 H V C CNN
+F1 "CustomResistors_Default_Resistor" 25 -100 50 H I C CNN
+F2 "" 0 100 50 H I C CNN
+F3 "" 0 100 50 H I C CNN
+F4 "*" 0 -100 50 H V C CNN "Value"
+$FPLIST
+ *Resistor*
+$ENDFPLIST
+DRAW
+S -125 50 125 -50 0 1 0 N
+X ~ 1 -225 0 100 R 50 50 1 1 B
+X ~ 2 225 0 100 L 50 50 1 1 B
+ENDDRAW
+ENDDEF
+#
+# Hit-and-Run-Schematics-rescue_+3.3V-power
+#
+DEF Hit-and-Run-Schematics-rescue_+3.3V-power #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "Hit-and-Run-Schematics-rescue_+3.3V-power" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +3V3 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# Hit-and-Run-Schematics-rescue_+5V-power
+#
+DEF Hit-and-Run-Schematics-rescue_+5V-power #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "Hit-and-Run-Schematics-rescue_+5V-power" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +5V 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# Hit-and-Run-Schematics-rescue_+BATT-power
+#
+DEF Hit-and-Run-Schematics-rescue_+BATT-power #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "Hit-and-Run-Schematics-rescue_+BATT-power" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +BATT 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# Hit-and-Run-Schematics-rescue_-BATT-power
+#
+DEF Hit-and-Run-Schematics-rescue_-BATT-power #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "Hit-and-Run-Schematics-rescue_-BATT-power" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 2 0 1 0 0 0 0 100 N
+P 4 0 1 0 30 50 -30 50 0 100 30 50 F
+X -BATT 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# Hit-and-Run-Schematics-rescue_GND-power
+#
+DEF Hit-and-Run-Schematics-rescue_GND-power #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -250 50 H I C CNN
+F1 "Hit-and-Run-Schematics-rescue_GND-power" 0 -150 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 6 0 1 0 0 0 0 -50 50 -50 0 -100 -50 -50 0 -50 N
+X GND 1 0 0 0 D 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+#End Library

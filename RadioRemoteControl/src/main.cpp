@@ -33,12 +33,39 @@
  * 
  *  param: Delay
  */
-#define DELAY_TIME 1000
+#define DELAY_TIME_REMOTE_OPERATION 1000
 
 
 /** Initialize Objects 
  */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
+
+
+/** Настройки serial порта 
+ */
+void serialSettings()
+{
+    Serial.begin(SERIAL_BAUDRATE);
+    printf_begin();
+    printf("[%ld] [MAIN] --- ***** RADIO REMOTE CONTROL ***** \n", millis());
+}
+
+
+/** Настройки пинов 
+ *  param: pin  --> пин кнопки
+ *  param: mode --> режим кнопки
+ */
+void pinModeSettings()
+{
+    pinMode(PIN_BUTTON_START,               INPUT);
+    pinMode(PIN_BUTTON_STOP,                INPUT);
+    pinMode(PIN_BUTTON_SCORE_GREEN_UP,      INPUT);
+    pinMode(PIN_BUTTON_SCORE_GREEN_DOWN,    INPUT);
+    pinMode(PIN_BUTTON_SCORE_RED_UP,        INPUT);
+    pinMode(PIN_BUTTON_SCORE_RED_DOWN,      INPUT);
+    pinMode(PIN_BUTTON_UPDATE_SCORE,        INPUT);
+    pinMode(PIN_BUTTON_UPDATE_TIMER,        INPUT);
+}
 
 
 /** Настройки радиоканала 
@@ -69,34 +96,7 @@ void remoteOperation(const uint8_t buttonOperation, char *buttonText)
 {
     radio.write(&buttonOperation, sizeof(buttonOperation));
     printf("[%ld] [INFO] --- Button {%s} was clicked!\n", millis(), buttonText);
-    delay(DELAY_TIME);
-}
-
-
-/** Настройки serial порта 
- */
-void serialSettings()
-{
-    Serial.begin(SERIAL_BAUDRATE);
-    printf_begin();
-    printf("[%ld] [MAIN] --- ***** RADIO REMOTE CONTROL ***** \n", millis());
-}
-
-
-/** Настройки пинов 
- *  param: pin  --> пин кнопки
- *  param: mode --> режим кнопки
- */
-void pinSettings()
-{
-    pinMode(PIN_BUTTON_START,               INPUT);
-    pinMode(PIN_BUTTON_STOP,                INPUT);
-    pinMode(PIN_BUTTON_SCORE_GREEN_UP,      INPUT);
-    pinMode(PIN_BUTTON_SCORE_GREEN_DOWN,    INPUT);
-    pinMode(PIN_BUTTON_SCORE_RED_UP,        INPUT);
-    pinMode(STATUS_BUTTON_SCORE_RED_DOWN,   INPUT);
-    pinMode(PIN_BUTTON_UPDATE_SCORE,        INPUT);
-    pinMode(PIN_BUTTON_UPDATE_TIMER,        INPUT);
+    delay(DELAY_TIME_REMOTE_OPERATION);
 }
 
 
@@ -104,21 +104,22 @@ void pinSettings()
  */
 void setup() 
 {
-    // Serial settings
+    // Settings for serial port
     serialSettings();
 
-    // Radio settings
+    // Settings for radio channel
     radioSettings();
 
-    // Pins settings
-    pinSettings();
+    // Settings for pins
+    pinModeSettings();
 
     // Wait for console opening
-    delay(3000);
+    delay(SERIAL_DELAY_CONSOLE_ACTIVATE);
 }
 
 
 /** Бесконечный цикл микроконтроллера 
+ *  Выбор команды на пульте ДУ и отправка данных на контроллер
  */
 void loop() 
 {

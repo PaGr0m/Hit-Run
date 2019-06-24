@@ -7,16 +7,16 @@
  * 
  *  param: SERIAL
  *  param: RADIO
- *  param: STATUSES
  */
 #define SERIAL_BAUDRATE 9600
+#define SERIAL_DELAY_CONSOLE_ACTIVATE 3000
 
 #define RADIO_CHANNEL                   5
 #define RADIO_PIPE_GREEN                1
 #define RADIO_PIPE_RED                  2
 #define RADIO_ADDRESS_GREEN             0xAABBCCDD11LL
 #define RADIO_ADDRESS_RED               0xAABBCCDD22LL
-#define RADIO_ADDRESS_REMOTE_CONTROL    0xAABBCCDD22LL
+#define RADIO_ADDRESS_REMOTE_CONTROL    0xAABBCCDD33LL
 #define RADIO_DATARATE                  RF24_1MBPS
 #define RADIO_PALEVEL                   RF24_PA_HIGH
 

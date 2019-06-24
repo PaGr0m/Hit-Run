@@ -21,11 +21,17 @@
 
 /** Define Pins 
  * 
- *  param: NRF
+ *  param: BUZZER
+ *  param: LED Matrix
  *  param: LCD
+ *  param: NRF
  */
-#define PIN_NRF_CE 7
-#define PIN_NRF_CSN 8
+
+// TODO: определить номер пина
+#define PIN_LED_MATRIX_GREEN 1
+#define PIN_LED_MATRIX_RED   2
+
+#define PIN_BUZZER 2
 
 #define PIN_LCD_DB7 3
 #define PIN_LCD_DB6 4
@@ -34,12 +40,21 @@
 #define PIN_LCD_RS  A0
 #define PIN_LCD_E   A1
 
+#define PIN_NRF_CE 7
+#define PIN_NRF_CSN 8
+
 
 /** Define Variables 
  *  Константы переменных
  * 
+ *  param: BUZZER
+ *  param: DELAY
  *  param: LCD
  */
+#define BUZZER_TONE 1000
+
+#define DELAY_SIGNAL_TIME 2000
+
 #define LCD_COLUMN_TIMER_MINUTE 7
 #define LCD_COLUMN_TIMER_SECONDS 9
 #define LCD_ROW_TIMER 1
@@ -49,9 +64,12 @@
  */
 uint8_t sportsmenGreen;
 uint8_t sportsmenRed;
-volatile bool flag_tx = false;
-volatile bool flag_fail = false;
-volatile bool flag_rx = false;
+
+uint8_t roundMinute = 0;
+uint8_t roundSecond = 0;
+
+const char ROUND_MINUTE = 2;
+const char ROUND_SECONDS = 60;
 
 const uint8_t STATUS_HIT_GREEN          = 1;
 const uint8_t STATUS_HIT_RED            = 2;
@@ -60,10 +78,9 @@ const uint8_t STATUS_HIT_GREEN_REMOVE   = 8;
 const uint8_t STATUS_HIT_RED_REMOVE     = 9;
 const uint8_t STATUS_HIT_UPDATE         = 0;
 
-const char ROUND_MINUTE = 2;
-const char ROUND_SECONDS = 60;
-uint8_t roundMinute = 0;
-uint8_t roundSecond = 0;
+volatile bool flag_tx = false;
+volatile bool flag_fail = false;
+volatile bool flag_rx = false;
 
 
 /** Initialize Objects 
@@ -127,6 +144,7 @@ void displayTemplate()
     lcd.print("Timer  3:00     ");
 }
 
+
 /** Инициализия символов на дисплее 
  *  param: RAW     --> первый параметр setCursor
  *  param: COLLUMN --> второй параметр setCursor
@@ -144,6 +162,7 @@ void displaySettings()
     displayTemplate();
 }
 
+
 /** Обновление счетчика на дисплее 
  *  param: sportsmenGreen --> счетчик уколов зеленого спортсмена
  *  param: sportsmenRed   --> счетчик уколов красного спортсмена
@@ -156,6 +175,7 @@ void updateScoreLcd(uint8_t sportsmenGreen, uint8_t sportsmenRed)
     lcd.setCursor(9, 0);
     lcd.print(sportsmenRed);
 }
+
 
 /** Обновление счетчика уколов 
  *  param: status 
@@ -195,6 +215,7 @@ void updateScoreCounter(uint8_t status)
     updateScoreLcd(sportsmenGreen, sportsmenRed);
 }
 
+
 /** Инициализация таймера на LCD дисплее 
  */
 void initialTimerLcd()
@@ -221,6 +242,61 @@ void updateTimerLcd(uint8_t minute, uint8_t seconds)
         lcd.setCursor(LCD_COLUMN_TIMER_SECONDS, LCD_ROW_TIMER);
         lcd.print(seconds);
     }
+}
+
+
+/** Визуализировать зафиксированный удар 
+ *      1 - зажечь LED матрицы
+ *      2 - включается зуммер
+ *      3 - все работает в течении DELAY_SIGNAL_TIME
+ *      4 - выключить зуммер
+ *      5 - выключить LED матрицы
+ *  
+ * param: status 
+ *      --> 1 - укол присуждается зеленому спортсмену
+ *      --> 2 - укол присуждается красному спортсмену
+ *      --> 3 - укол присуждается обоим спортсменам
+ */
+void visualizeHit(uint8_t status)
+{
+    uint8_t matrix;
+
+    if (status == STATUS_HIT_GREEN)
+    {
+        matrix = PIN_LED_MATRIX_GREEN;
+    }
+    else if (status == STATUS_HIT_RED)
+    {
+        matrix = PIN_LED_MATRIX_RED;
+    }
+    else if (status == STATUS_HIT_DUAL) 
+    {
+        digitalWrite(PIN_LED_MATRIX_GREEN, HIGH);
+        digitalWrite(PIN_LED_MATRIX_RED, HIGH);
+            tone(PIN_BUZZER, BUZZER_TONE);
+                delay(DELAY_SIGNAL_TIME);
+            noTone(PIN_BUZZER);
+        digitalWrite(PIN_LED_MATRIX_RED, LOW);
+        digitalWrite(PIN_LED_MATRIX_GREEN, LOW);
+
+        return;
+    }
+
+    digitalWrite(matrix, HIGH);
+        tone(PIN_BUZZER, BUZZER_TONE);
+            delay(DELAY_SIGNAL_TIME);
+        noTone(PIN_BUZZER);
+    digitalWrite(matrix, LOW);
+}
+
+
+/** Настройки режимов пинов
+ */
+void pinModeSettings()
+{
+    pinMode(PIN_LED_MATRIX_GREEN, OUTPUT);
+    pinMode(PIN_LED_MATRIX_RED, OUTPUT);
+    pinMode(PIN_BUZZER, OUTPUT);
 }
 
 
@@ -256,20 +332,23 @@ void setup()
      */
     attachInterrupt(0, checkRadioData, FALLING);
     
-    // Serial settings
+    // Settings for serial port
     serialSettings();
 
-    // Radio settings
+    // Settings for radio channel
     radioSettings();
 
-    // RTC settings
+    // Settings for RTC module
     rtcSettings();
 
-    // LCD settings    
+    // Settings for Liquid Crystal Display
     displaySettings();
 
+    // Settings for pins
+    pinModeSettings();
+
     // Wait for console opening
-    delay(3000);
+    delay(SERIAL_DELAY_CONSOLE_ACTIVATE);
 }
 
 
@@ -321,6 +400,7 @@ void loop()
 
                         printf("[%ld] [DEBUG] --- Sportsmen hit status: %d\n", millis(), receiveStatus);
                         updateScoreCounter(receiveStatus);
+                        visualizeHit(receiveStatus);
 
                         roundMinute = rtc.now().minute();
                         roundSecond = rtc.now().second();
@@ -357,6 +437,8 @@ void loop()
             // ---------------------------------------
 
             printf("[%ld] [INFO] --- Test sportsmen hit status: %d\n", millis(), receiveStatus);
+
+            visualizeHit(receiveStatus);
         }
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP) updateScoreCounter(STATUS_HIT_GREEN);
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN) updateScoreCounter(STATUS_HIT_GREEN_REMOVE);

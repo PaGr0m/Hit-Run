@@ -14,16 +14,24 @@
 
 /** Define Pins 
  * 
- *  param: NRF
  *  param: Buttons
  *  param: LED
+ *  param: NRF
  */
-#define PIN_NRF_CE  7
-#define PIN_NRF_CSN 8
-
 #define PIN_BUTTON 2
 
 #define PIN_LED 4
+
+#define PIN_NRF_CE  7
+#define PIN_NRF_CSN 8
+
+
+/** Define Variables 
+ *  Константы переменных
+ * 
+ *  param: Delay
+ */
+#define DELAY_TIME_SEND_DATA 2000
 
 
 /** Sportsmen Colors
@@ -36,6 +44,16 @@ const uint8_t SPORTSMEN_COLOR = 1;
 /** Initialize Objects 
  */
 RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
+
+
+/** Настройки serial порта 
+ */
+void serialSettings()
+{
+    Serial.begin(SERIAL_BAUDRATE);
+    printf_begin();
+    printf("[%ld] [MAIN] --- <<--- SENDER --->>\n", millis());
+}
 
 
 /** Настройки радиоканала 
@@ -58,35 +76,40 @@ void radioSettings()
     radio.printDetails();
 }
 
-// Setup
-void setup()
+/** Отправка данных на контроллер
+ */
+void sendData () 
 {
-    // Serial settings
-    Serial.begin(SERIAL_BAUDRATE);
-    printf_begin();
-    printf("[%ld] [MAIN] --- <<--- SENDER --->>\n", millis());
-
-    // Radio settings
-    radioSettings();
-
-    // Wait for console opening
-    delay(3000);
+    radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
+    printf("[%ld] [INFO] --- Button {%d} clicked!\n", millis(), SPORTSMEN_COLOR);
+    delay(DELAY_TIME_SEND_DATA);
 }
 
 
-// TODO: Убрать светодиоды
-// Loop
+/** Установка начальных значений 
+ */
+void setup()
+{
+    // Settings for serial port
+    serialSettings();
+
+    // Settings for radio channel
+    radioSettings();
+
+    // Wait for console opening
+    delay(SERIAL_DELAY_CONSOLE_ACTIVATE);
+}
+
+
+/** Бесконечный цикл микроконтроллера 
+ */
 void loop() 
 {
     /*
-    Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
+    Шпага: при нажатии кнопки, сигнал отправляется на контроллер 
     */
     if (digitalRead(PIN_BUTTON) == HIGH)
     {
-        radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));
-        printf("[%ld] [INFO] --- Button {%d} clicked!\n", millis(), SPORTSMEN_COLOR);
-        digitalWrite(PIN_LED, HIGH);
-        delay(2000);
-        digitalWrite(PIN_LED, LOW);
+        sendData();
     }
 }

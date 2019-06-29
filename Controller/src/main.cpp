@@ -94,6 +94,7 @@ void radioSettings()
     radio.setPALevel(RADIO_PALEVEL);                     
     radio.openReadingPipe(RADIO_PIPE_GREEN, RADIO_ADDRESS_GREEN);   // Открываем трубу с идентификатором, для приема данных
     radio.openReadingPipe(RADIO_PIPE_RED, RADIO_ADDRESS_RED);       // Открываем трубу с идентификатором, для приема данных
+    radio.openReadingPipe(RADIO_PIPE_REMOTE_CONTROL, RADIO_ADDRESS_REMOTE_CONTROL); 
     radio.printDetails();
     radio.startListening();
 }
@@ -136,7 +137,7 @@ void displaySettings()
     lcd.begin(2, 16);
 
     lcd.setCursor(0, 0);
-    lcd.print("Controller V2.1");
+    lcd.print("Controller V2.2");
 
     lcd.setCursor(0, 1);
     lcd.print(" by Pavel Gromov");

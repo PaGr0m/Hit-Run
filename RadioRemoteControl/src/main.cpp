@@ -94,7 +94,7 @@ void pinSettings()
     pinMode(PIN_BUTTON_SCORE_GREEN_UP,      INPUT);
     pinMode(PIN_BUTTON_SCORE_GREEN_DOWN,    INPUT);
     pinMode(PIN_BUTTON_SCORE_RED_UP,        INPUT);
-    pinMode(STATUS_BUTTON_SCORE_RED_DOWN,   INPUT);
+    pinMode(PIN_BUTTON_SCORE_RED_DOWN,      INPUT);
     pinMode(PIN_BUTTON_UPDATE_SCORE,        INPUT);
     pinMode(PIN_BUTTON_UPDATE_TIMER,        INPUT);
 }

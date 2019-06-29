@@ -54,7 +54,7 @@ void radioSettings()
     radio.setChannel(RADIO_CHANNEL);  
     radio.setDataRate(RADIO_DATARATE);  
     radio.setPALevel(RADIO_PALEVEL);    
-    radio.openWritingPipe(RADIO_ADDRESS_GREEN);
+    radio.openWritingPipe(RADIO_ADDRESS_RED);
     radio.printDetails();
 }
 
@@ -69,6 +69,8 @@ void setup()
     // Radio settings
     radioSettings();
 
+    pinMode(PIN_BUTTON, INPUT);
+
     // Wait for console opening
     delay(3000);
 }
@@ -81,6 +83,7 @@ void loop()
     /*
     Для шпаги, при нажатии кнопки, сигнал проходит до Sender'a
     */
+
     if (digitalRead(PIN_BUTTON) == HIGH)
     {
         radio.write(&SPORTSMEN_COLOR, sizeof(SPORTSMEN_COLOR));

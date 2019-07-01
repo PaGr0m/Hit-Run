@@ -49,12 +49,11 @@ RF24 radio(PIN_NRF_CE, PIN_NRF_CSN);
  */
 void radioSettings() 
 {
-     
     radio.begin();
     radio.setChannel(RADIO_CHANNEL);  
     radio.setDataRate(RADIO_DATARATE);  
     radio.setPALevel(RADIO_PALEVEL);    
-    radio.openWritingPipe(RADIO_ADDRESS_RED);
+    radio.openWritingPipe(RADIO_ADDRESS_GREEN);
     radio.printDetails();
 }
 
@@ -65,6 +64,7 @@ void setup()
     Serial.begin(SERIAL_BAUDRATE);
     printf_begin();
     printf("[%ld] [MAIN] --- <<--- SENDER --->>\n", millis());
+    printf("[%ld] [MAIN] Address = %d \n", millis(), RADIO_ADDRESS_GREEN);
 
     // Radio settings
     radioSettings();

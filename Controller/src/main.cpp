@@ -30,9 +30,15 @@
 #define PIN_LCD_DB7 3
 #define PIN_LCD_DB6 4
 #define PIN_LCD_DB5 5
-#define PIN_LCD_DB4 6
+#define PIN_LCD_DB4 A2 //6
 #define PIN_LCD_RS  A0
 #define PIN_LCD_E   A1
+
+#define PIN_LED_MATRIX_GREEN 9
+#define PIN_LED_MATRIX_RED   10
+
+#define PIN_BUZZER 6       // ?? 
+
 
 
 /** Define Variables 
@@ -43,6 +49,8 @@
 #define LCD_COLUMN_TIMER_MINUTE 7
 #define LCD_COLUMN_TIMER_SECONDS 9
 #define LCD_ROW_TIMER 1
+
+#define BUZZER_FREQUENCY 500
 
 
 /** Initialize Variables 
@@ -137,10 +145,12 @@ void displaySettings()
     lcd.begin(2, 16);
 
     lcd.setCursor(0, 0);
-    lcd.print("Controller V2.2");
+    lcd.print("Controller V2.3");
 
     lcd.setCursor(0, 1);
     lcd.print(" by Pavel Gromov");
+
+    delay(500);
 
     displayTemplate();
 }
@@ -244,8 +254,58 @@ void serialSettings()
     Serial.begin(SERIAL_BAUDRATE);
     printf_begin();
     printf("[%ld] [MAIN] --- ***** RADIO REMOTE CONTROL *****\n", millis());
+    printf("[%ld] [MAIN] %d) GREEN --> %d \n",  millis(), RADIO_PIPE_GREEN, RADIO_ADDRESS_GREEN);
+    printf("[%ld] [MAIN] %d) RED --> %d \n",    millis(), RADIO_PIPE_RED, RADIO_ADDRESS_RED);
+    printf("[%ld] [MAIN] %d) RADIO --> %d \n",  millis(), RADIO_PIPE_REMOTE_CONTROL, RADIO_ADDRESS_REMOTE_CONTROL);
 }
 
+void pinModeSettings() 
+{
+    pinMode(PIN_LED_MATRIX_GREEN, OUTPUT);
+    digitalWrite(PIN_LED_MATRIX_GREEN, LOW);
+
+    pinMode(PIN_LED_MATRIX_RED, OUTPUT);
+    digitalWrite(PIN_LED_MATRIX_RED, LOW);
+
+    pinMode(PIN_BUZZER, OUTPUT);
+}
+
+
+void sound(uint8_t status) 
+{
+    uint8_t sportsmenPin = 0;
+
+    if (status == 1)
+    {
+        digitalWrite(PIN_LED_MATRIX_GREEN, HIGH);
+            analogWrite(PIN_BUZZER, 127);
+            // tone(PIN_BUZZER, BUZZER_FREQUENCY);
+                delay(2000);
+            // noTone(PIN_BUZZER);
+            analogWrite(PIN_BUZZER, 0);
+        digitalWrite(PIN_LED_MATRIX_GREEN, LOW);
+    }
+    else if (status == 2)
+    {
+        digitalWrite(PIN_LED_MATRIX_RED, HIGH);
+        //     analogWrite(PIN_BUZZER, 127);
+        //     // tone(PIN_BUZZER, BUZZER_FREQUENCY);
+                delay(2000);
+        //     // noTone(PIN_BUZZER);
+        //     analogWrite(PIN_BUZZER, 0);
+        digitalWrite(PIN_LED_MATRIX_RED, LOW);
+    }
+    else if (sportsmenPin == 3)
+    {
+        digitalWrite(PIN_LED_MATRIX_GREEN, HIGH);
+        digitalWrite(PIN_LED_MATRIX_RED, HIGH);
+        //     tone(PIN_BUZZER, BUZZER_FREQUENCY);
+                delay(2000);
+        //     noTone(PIN_BUZZER);
+        digitalWrite(PIN_LED_MATRIX_RED, LOW);
+        digitalWrite(PIN_LED_MATRIX_GREEN, LOW);
+    }
+}
 
 /** Установка начальных значений 
  */
@@ -268,6 +328,9 @@ void setup()
 
     // LCD settings    
     displaySettings();
+
+    // Settings for Pins
+    pinModeSettings();
 
     // Wait for console opening
     delay(3000);
@@ -322,6 +385,7 @@ void loop()
 
                         printf("[%ld] [DEBUG] --- Sportsmen hit status: %d\n", millis(), receiveStatus);
                         updateScoreCounter(receiveStatus);
+                        sound(receiveStatus);
 
                         roundMinute = rtc.now().minute();
                         roundSecond = rtc.now().second();
@@ -358,6 +422,7 @@ void loop()
             // ---------------------------------------
 
             printf("[%ld] [INFO] --- Test sportsmen hit status: %d\n", millis(), receiveStatus);
+            sound(receiveStatus);
         }
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_UP) updateScoreCounter(STATUS_HIT_GREEN);
         else if (receiveStatus == STATUS_BUTTON_SCORE_GREEN_DOWN) updateScoreCounter(STATUS_HIT_GREEN_REMOVE);
@@ -365,6 +430,8 @@ void loop()
         else if (receiveStatus == STATUS_BUTTON_SCORE_RED_DOWN) updateScoreCounter(STATUS_HIT_RED_REMOVE);
         else if (receiveStatus == STATUS_BUTTON_UPDATE_SCORE) updateScoreCounter(STATUS_HIT_UPDATE);
         else if (receiveStatus == STATUS_BUTTON_UPDATE_TIMER) initialTimerLcd();
+
+        printf("\n");
     }
 
     /** Если данные не отправленны 
